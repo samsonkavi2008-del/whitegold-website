@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldDesk — Staff Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0f0d04;color:#f0e8d0;min-height:100vh}
+
+/* ── SUPABASE CONFIG NOTICE ── */
+.setup-notice{background:#1a1508;border:1px solid #C9A84C;border-radius:8px;padding:20px;margin:20px;max-width:700px;margin:20px auto}
+.setup-notice h3{color:#C9A84C;margin-bottom:10px;font-size:15px}
+.setup-notice p{color:#9a8a6a;font-size:13px;line-height:1.7}
+.setup-notice code{background:#111;padding:2px 8px;border-radius:4px;color:#E8C96A;font-size:12px;font-family:monospace}
+
+/* ── LOGIN PAGE ── */
+#loginPage{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:#0f0d04;position:relative;overflow:hidden}
+#loginPage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(201,168,76,0.07) 0%,transparent 65%)}
+.login-card{background:#181508;border:1px solid rgba(201,168,76,0.25);padding:48px 44px;max-width:420px;width:100%;position:relative;z-index:1;box-shadow:0 32px 80px rgba(0,0,0,0.5)}
+.login-card::before{content:'◆ WHITE GOLD ◆';position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:#C9A84C;color:rgba(255,255,255,0.9);font-size:9px;font-weight:600;letter-spacing:0.2em;padding:4px 18px;white-space:nowrap}
+.login-logo{text-align:center;margin:12px 0 32px}
+.login-logo .brand{font-family:'Cormorant Garamond',serif;font-size:26px;color:#C9A84C;letter-spacing:0.08em}
+.login-logo .sub{font-size:12px;color:#6a5a3a;margin-top:4px;letter-spacing:0.1em;text-transform:uppercase}
+.lf{margin-bottom:18px}
+.lf label{display:block;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#7a6a4a;margin-bottom:7px}
+.lf input,.lf select{width:100%;padding:13px 16px;border:1.5px solid rgba(201,168,76,0.2);font-size:14px;font-family:'Inter',sans-serif;color:#f0e8d0;background:#111008;outline:none;transition:border-color 0.2s;appearance:none;border-radius:2px}
+.lf input:focus,.lf select:focus{border-color:#C9A84C}
+.lf select option{background:#111008}
+.login-btn{width:100%;padding:15px;background:#C9A84C;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;border:none;cursor:pointer;margin-top:8px;transition:background 0.2s;border-radius:2px}
+.login-btn:hover{background:#8B6914}
+.login-btn:disabled{background:#4a3a1a;cursor:not-allowed}
+.login-error{background:rgba(200,50,50,0.15);border:1px solid rgba(200,50,50,0.4);color:#f08080;font-size:13px;padding:10px 14px;margin-top:12px;border-radius:2px;display:none}
+.login-note{font-size:11px;color:#4a3a1a;text-align:center;margin-top:18px;line-height:1.6}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;overflow:hidden}
+.shell{display:flex;height:100%}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;background:#0d0b03;border-right:1px solid rgba(201,168,76,0.12);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(201,168,76,0.1)}
+.sb-logo .brand{font-family:'Cormorant Garamond',serif;font-size:19px;color:#C9A84C;letter-spacing:0.06em}
+.sb-logo .role-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;padding:3px 10px;margin-top:5px;border-radius:2px}
+.badge-admin{background:rgba(201,168,76,0.2);color:#C9A84C;border:1px solid rgba(201,168,76,0.3)}
+.badge-manager{background:rgba(30,100,200,0.2);color:#6ab0f0;border:1px solid rgba(30,100,200,0.3)}
+.sb-section{font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#4a3a1a;padding:14px 18px 6px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:#7a6a4a;cursor:pointer;transition:all 0.15s;border-left:2px solid transparent}
+.sb-item:hover{background:rgba(201,168,76,0.06);color:#C9A84C}
+.sb-item.active{background:rgba(201,168,76,0.08);color:#C9A84C;border-left-color:#C9A84C;font-weight:500}
+.sb-item .icon{font-size:16px;width:18px;text-align:center}
+.sb-bottom{margin-top:auto;padding:16px 18px;border-top:1px solid rgba(201,168,76,0.1)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#C9A84C;flex-shrink:0}
+.sb-name{font-size:12px;color:#9a8a6a;font-weight:500}
+.sb-branch{font-size:10px;color:#4a3a1a;margin-top:1px}
+.logout-btn{font-size:11px;color:#5a3a1a;cursor:pointer;margin-top:6px;display:inline-block;transition:color 0.2s}
+.logout-btn:hover{color:#C9A84C}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;background:#111008}
+.page-view{display:none;padding:28px 32px}
+.page-view.active{display:block}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:#f0e8d0}
+.page-sub{font-size:13px;color:#6a5a3a;margin-top:3px}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.metric{background:#181508;border:1px solid rgba(201,168,76,0.15);padding:18px 20px;border-radius:4px}
+.metric-label{font-size:11px;color:#6a5a3a;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
+.metric-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#C9A84C;line-height:1}
+.metric-sub{font-size:11px;color:#4a3a1a;margin-top:4px}
+.metric-up{color:#5de07a}
+.metric-down{color:#e05d5d}
+
+/* ── CARDS ── */
+.card{background:#181508;border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:20px;margin-bottom:16px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:500;color:#d4c090}
+
+/* ── ALERTS ── */
+.alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:4px;font-size:13px;margin-bottom:10px}
+.alert-warning{background:rgba(200,150,20,0.12);border:1px solid rgba(200,150,20,0.3);color:#d4a840}
+.alert-success{background:rgba(30,110,58,0.12);border:1px solid rgba(30,110,58,0.3);color:#5de07a}
+.alert-info{background:rgba(30,80,200,0.12);border:1px solid rgba(30,80,200,0.3);color:#6ab0f0}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:9px 12px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#6a5a3a;border-bottom:1px solid rgba(201,168,76,0.15)}
+td{padding:11px 12px;color:#c0b090;border-bottom:1px solid rgba(201,168,76,0.07)}
+tr:hover td{background:rgba(201,168,76,0.04)}
+tr:last-child td{border-bottom:none}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.05em}
+.badge-done{background:rgba(30,110,58,0.2);color:#5de07a}
+.badge-pending{background:rgba(200,150,20,0.2);color:#d4a840}
+.badge-flagged{background:rgba(200,50,50,0.2);color:#f08080}
+.badge-admin2{background:rgba(201,168,76,0.2);color:#C9A84C}
+.badge-manager2{background:rgba(30,100,200,0.2);color:#6ab0f0}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:12px;font-weight:500;letter-spacing:0.06em;border-radius:2px;cursor:pointer;transition:all 0.2s;border:1px solid rgba(201,168,76,0.25);background:transparent;color:#C9A84C;font-family:'Inter',sans-serif}
+.btn:hover{background:rgba(201,168,76,0.1)}
+.btn-solid{background:#C9A84C;color:#0f0d04;border-color:#C9A84C}
+.btn-solid:hover{background:#8B6914}
+.btn-danger{border-color:rgba(200,50,50,0.4);color:#f08080}
+.btn-danger:hover{background:rgba(200,50,50,0.1)}
+.btn-sm{padding:5px 12px;font-size:11px}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.ff{display:flex;flex-direction:column;gap:5px}
+.ff label{font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#6a5a3a}
+.ff input,.ff select,.ff textarea{padding:10px 14px;border:1.5px solid rgba(201,168,76,0.18);font-size:13px;font-family:'Inter',sans-serif;color:#f0e8d0;background:#111008;outline:none;transition:border-color 0.2s;border-radius:2px;appearance:none}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:#C9A84C}
+.ff select option{background:#111008}
+.calc-result{background:#111008;border:1px solid rgba(201,168,76,0.2);padding:16px;text-align:center;border-radius:4px;margin-top:8px}
+.calc-result-label{font-size:11px;color:#6a5a3a;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px}
+.calc-result-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#C9A84C}
+.calc-note{font-size:10px;color:#4a3a1a;margin-top:4px}
+
+/* ── BAR CHART ── */
+.bar-wrap{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.bar-label{width:90px;color:#6a5a3a;text-align:right;flex-shrink:0}
+.bar-bg{flex:1;height:9px;background:rgba(201,168,76,0.1);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;background:#C9A84C;transition:width 0.6s ease}
+.bar-val{width:60px;color:#C9A84C;font-weight:500;font-size:11px}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── RATE TICKER ── */
+.rate-bar{background:#C9A84C;padding:7px 0;overflow:hidden;font-size:11px;font-weight:500;letter-spacing:0.08em;color:#fff;white-space:nowrap;flex-shrink:0}
+.rate-track{display:flex;animation:rtick 25s linear infinite;width:max-content}
+.rate-item{padding:0 36px}
+.rate-item b{opacity:0.65;margin-right:6px;font-weight:400}
+@keyframes rtick{to{transform:translateX(-50%)}}
+
+/* ── STAFF TABLE ACTIONS ── */
+.action-cell{display:flex;gap:6px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#181508;border:1px solid rgba(201,168,76,0.25);padding:32px;max-width:480px;width:100%;border-radius:4px;position:relative}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:#f0e8d0;margin-bottom:4px}
+.modal-sub{font-size:12px;color:#6a5a3a;margin-bottom:20px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#6a5a3a;font-size:20px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#C9A84C}
+
+/* ── REVIEW CARD ── */
+.review-card{background:#111008;border:1px solid rgba(201,168,76,0.12);padding:18px;border-radius:4px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.review-stars{color:#C9A84C;font-size:12px;margin-bottom:6px}
+.review-text{font-size:13px;color:#9a8a6a;font-style:italic;line-height:1.6;flex:1}
+.review-author{font-size:12px;font-weight:500;color:#d4c090;margin-top:8px}
+.review-city{font-size:11px;color:#6a5a3a}
+
+/* ── BRANCH CARD ── */
+.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.branch-card{background:#111008;border:1px solid rgba(201,168,76,0.12);padding:14px 16px;border-radius:4px;display:flex;justify-content:space-between;align-items:center}
+.branch-name{font-size:13px;font-weight:500;color:#d4c090}
+.branch-state{font-size:11px;color:#6a5a3a;margin-top:2px}
+
+/* ── TOP BAR ── */
+.top-bar{height:48px;background:#0d0b03;border-bottom:1px solid rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0}
+.top-bar-title{font-size:13px;font-weight:500;color:#9a8a6a}
+.top-bar-right{display:flex;align-items:center;gap:16px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#5de07a;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.live-text{font-size:11px;color:#5de07a;letter-spacing:0.06em}
+.top-time{font-size:12px;color:#6a5a3a;font-family:monospace}
+
+/* ── LOADING ── */
+#loadingScreen{position:fixed;inset:0;background:#0f0d04;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;transition:opacity 0.3s}
+.loader-logo{font-family:'Cormorant Garamond',serif;font-size:32px;color:#C9A84C;letter-spacing:0.1em}
+.loader-bar{width:200px;height:2px;background:rgba(201,168,76,0.15);border-radius:2px;overflow:hidden}
+.loader-fill{height:100%;background:#C9A84C;border-radius:2px;animation:load 1.2s ease-in-out forwards}
+@keyframes load{from{width:0}to{width:100%}}
+.loader-text{font-size:12px;color:#6a5a3a;letter-spacing:0.1em}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadingScreen" style="position:fixed;inset:0;background:#0f0d04;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px">
+  <div class="loader-logo">GoldDesk</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text">INITIALISING SYSTEM...</div>
+</div>
+
+<!-- ══ SUPABASE SETUP NOTICE ══ -->
+<div id="setupNotice" style="display:none;min-height:100vh;padding:40px 20px;background:#0f0d04">
+  <div class="setup-notice">
+    <h3>⚙️ Supabase Setup Required — One Time Only</h3>
+    <p style="margin-bottom:12px">To activate the live login system, follow these 4 steps:</p>
+    <p><b style="color:#C9A84C">Step 1</b> — Go to <b>supabase.com</b> → Sign up free → Create a new project called <code>golddesk</code></p>
+    <p style="margin-top:8px"><b style="color:#C9A84C">Step 2</b> — In Supabase dashboard, go to <b>SQL Editor</b> and run this SQL:</p>
+    <div style="background:#111;padding:14px;margin:10px 0;border-radius:4px;font-family:monospace;font-size:11px;color:#E8C96A;line-height:1.8;border:1px solid rgba(201,168,76,0.2)">
+      create table staff (<br>
+      &nbsp;&nbsp;id uuid default gen_random_uuid() primary key,<br>
+      &nbsp;&nbsp;employee_id text unique not null,<br>
+      &nbsp;&nbsp;full_name text not null,<br>
+      &nbsp;&nbsp;email text unique not null,<br>
+      &nbsp;&nbsp;role text check (role in ('admin','manager')) not null,<br>
+      &nbsp;&nbsp;branch text not null,<br>
+      &nbsp;&nbsp;created_at timestamptz default now()<br>
+      );<br><br>
+      -- Insert first admin<br>
+      insert into staff (employee_id, full_name, email, role, branch)<br>
+      values ('WG-ADMIN', 'Admin Owner', 'admin@whitegold.in', 'admin', 'Head Office');
+    </div>
+    <p style="margin-top:8px"><b style="color:#C9A84C">Step 3</b> — Go to <b>Authentication → Users</b> → Click <b>Invite User</b> → Enter <code>admin@whitegold.in</code> → Set password</p>
+    <p style="margin-top:8px"><b style="color:#C9A84C">Step 4</b> — Go to <b>Project Settings → API</b> → Copy your <b>Project URL</b> and <b>anon public key</b> → Paste them below in the golddesk.html file where it says <code>YOUR_SUPABASE_URL</code> and <code>YOUR_SUPABASE_ANON_KEY</code></p>
+    <div style="margin-top:16px;padding:12px;background:#111;border-radius:4px;border:1px solid rgba(201,168,76,0.2)">
+      <p style="color:#C9A84C;font-size:12px;font-weight:600;margin-bottom:6px">In this file, find and replace:</p>
+      <p style="font-family:monospace;font-size:11px;color:#9a8a6a">const SUPABASE_URL = '<span style="color:#f08080">YOUR_SUPABASE_URL</span>'</p>
+      <p style="font-family:monospace;font-size:11px;color:#9a8a6a">const SUPABASE_KEY = '<span style="color:#f08080">YOUR_SUPABASE_ANON_KEY</span>'</p>
+    </div>
+    <p style="margin-top:14px;color:#5de07a;font-size:12px">✅ Once configured, this page will show the login form automatically.</p>
+  </div>
+</div>
+
+<!-- ══ LOGIN PAGE ══ -->
+<div id="loginPage" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;background:#0f0d04;position:relative;overflow:hidden">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand">GoldDesk</div>
+      <div class="sub">Staff Portal — White Gold India</div>
+    </div>
+    <div class="lf">
+      <label>Employee ID</label>
+      <input type="text" id="empId" placeholder="e.g. WG-ADMIN" autocomplete="off">
+    </div>
+    <div class="lf">
+      <label>Branch</label>
+      <select id="branchSel">
+        <option value="">Select your branch</option>
+        <option>Head Office</option>
+        <option>Bengaluru — Koramangala</option>
+        <option>Bengaluru — Indiranagar</option>
+        <option>Mumbai — Andheri</option>
+        <option>Chennai — T. Nagar</option>
+        <option>Hyderabad — Banjara Hills</option>
+        <option>Delhi — Connaught Place</option>
+        <option>Pune — Koregaon Park</option>
+        <option>Kochi — MG Road</option>
+        <option>Ahmedabad — CG Road</option>
+      </select>
+    </div>
+    <div class="lf">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="your@whitegold.in">
+    </div>
+    <div class="lf">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()" id="loginBtn">Sign In to GoldDesk</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-note">Internal access only · White Gold India<br>Issues? Contact IT: it@whitegold.in</div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+  <!-- Rate ticker -->
+  <div class="rate-bar">
+    <div class="rate-track">
+      <span class="rate-item"><b>24K</b>₹8,320/g</span>
+      <span class="rate-item"><b>22K</b>₹7,420/g</span>
+      <span class="rate-item"><b>18K</b>₹6,080/g</span>
+      <span class="rate-item"><b>14K</b>₹4,730/g</span>
+      <span class="rate-item"><b>MCX</b>₹73,450/10g ▲ 0.4%</span>
+      <span class="rate-item" id="appTime"><b>Live</b>--:--:--</span>
+      <span class="rate-item"><b>24K</b>₹8,320/g</span>
+      <span class="rate-item"><b>22K</b>₹7,420/g</span>
+      <span class="rate-item"><b>18K</b>₹6,080/g</span>
+      <span class="rate-item"><b>14K</b>₹4,730/g</span>
+      <span class="rate-item"><b>MCX</b>₹73,450/10g ▲ 0.4%</span>
+      <span class="rate-item" id="appTime2"><b>Live</b>--:--:--</span>
+    </div>
+  </div>
+
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-logo">
+        <div class="brand">GoldDesk</div>
+        <div class="role-badge" id="sbRoleBadge">Admin</div>
+      </div>
+
+      <div class="sb-section">Main</div>
+      <div class="sb-item active" onclick="nav('dashboard',this)"><span class="icon">⊞</span> Dashboard</div>
+      <div class="sb-item" onclick="nav('transaction',this)"><span class="icon">⊕</span> New Transaction</div>
+      <div class="sb-item" onclick="nav('records',this)"><span class="icon">≡</span> Records</div>
+
+      <div class="sb-section">Manage</div>
+      <div class="sb-item admin-only" onclick="nav('staff',this)"><span class="icon">◉</span> Staff</div>
+      <div class="sb-item admin-only" onclick="nav('branches',this)"><span class="icon">◈</span> Branches</div>
+      <div class="sb-item" onclick="nav('reports',this)"><span class="icon">▦</span> Reports</div>
+      <div class="sb-item admin-only" onclick="nav('reviews',this)"><span class="icon">★</span> Reviews</div>
+      <div class="sb-item admin-only" onclick="nav('rates',this)"><span class="icon">◆</span> Gold Rates</div>
+
+      <div class="sb-bottom">
+        <div class="sb-user">
+          <div class="sb-avatar" id="sbAvatar">AD</div>
+          <div>
+            <div class="sb-name" id="sbName">Admin</div>
+            <div class="sb-branch" id="sbBranch">Head Office</div>
+          </div>
+        </div>
+        <div class="logout-btn" onclick="doLogout()">⬡ Sign out</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="top-bar">
+        <div class="top-bar-title" id="topBarTitle">Dashboard</div>
+        <div class="top-bar-right">
+          <div class="live-dot"></div>
+          <div class="live-text">LIVE</div>
+          <div class="top-time" id="topTime">--:--:--</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="page-view active" id="pv-dashboard">
+        <div class="page-header">
+          <div class="page-title">Good morning 👋</div>
+          <div class="page-sub" id="dashDate">Tuesday, 16 June 2026 · Live gold rate: ₹7,420/g (22K)</div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Gold bought today</div><div class="metric-val">342g</div><div class="metric-sub metric-up">▲ +18g vs yesterday</div></div>
+          <div class="metric"><div class="metric-label">Amount paid out</div><div class="metric-val">₹24.6L</div><div class="metric-sub">12 transactions</div></div>
+          <div class="metric"><div class="metric-label">Active branches</div><div class="metric-val">94/100</div><div class="metric-sub">6 closed today</div></div>
+          <div class="metric"><div class="metric-label">Pending approvals</div><div class="metric-val" style="color:#d4a840">3</div><div class="metric-sub metric-down">Needs review</div></div>
+        </div>
+        <div class="alert alert-warning">⚠ Transaction #T-1089 flagged — payout above ₹3L threshold. Needs admin approval.</div>
+        <div class="alert alert-success">✓ Daily report for 15 June generated and sent to owner.</div>
+        <div class="alert alert-info">ℹ 3 new staff accounts added by managers today.</div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Today's transactions</div><button class="btn btn-sm" onclick="nav('records',null)">View all</button></div>
+            <div class="tbl-wrap"><table>
+              <tr><th>ID</th><th>Customer</th><th>Item</th><th>Weight</th><th>Paid</th><th>Status</th></tr>
+              <tr><td>#T-1092</td><td>Meena S.</td><td>Necklace</td><td>18g 22K</td><td>₹1,21,320</td><td><span class="badge badge-done">Done</span></td></tr>
+              <tr><td>#T-1091</td><td>Arjun P.</td><td>Ring</td><td>9g 18K</td><td>₹52,470</td><td><span class="badge badge-done">Done</span></td></tr>
+              <tr><td>#T-1090</td><td>Sunita R.</td><td>Bangle</td><td>42g 22K</td><td>₹2,82,960</td><td><span class="badge badge-done">Done</span></td></tr>
+              <tr><td>#T-1089</td><td>Ramesh V.</td><td>Chain</td><td>58g 24K</td><td>₹3,89,200</td><td><span class="badge badge-flagged">Flagged</span></td></tr>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Top branches today</div></div>
+            <div class="bar-wrap">
+              <div class="bar-row"><div class="bar-label">Koramangala</div><div class="bar-bg"><div class="bar-fill" style="width:85%"></div></div><div class="bar-val">₹8.2L</div></div>
+              <div class="bar-row"><div class="bar-label">T. Nagar</div><div class="bar-bg"><div class="bar-fill" style="width:72%"></div></div><div class="bar-val">₹6.9L</div></div>
+              <div class="bar-row"><div class="bar-label">Andheri</div><div class="bar-bg"><div class="bar-fill" style="width:65%"></div></div><div class="bar-val">₹6.2L</div></div>
+              <div class="bar-row"><div class="bar-label">Banjara Hills</div><div class="bar-bg"><div class="bar-fill" style="width:58%"></div></div><div class="bar-val">₹5.6L</div></div>
+              <div class="bar-row"><div class="bar-label">CG Road</div><div class="bar-bg"><div class="bar-fill" style="width:44%"></div></div><div class="bar-val">₹4.2L</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW TRANSACTION -->
+      <div class="page-view" id="pv-transaction">
+        <div class="page-header"><div class="page-title">New Transaction</div><div class="page-sub">Log a customer gold purchase</div></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Customer Details</div>
+          <div class="form-grid">
+            <div class="ff"><label>Full Name</label><input type="text" placeholder="e.g. Meena Sharma"></div>
+            <div class="ff"><label>Phone Number</label><input type="text" placeholder="+91 XXXXX XXXXX"></div>
+            <div class="ff"><label>ID Proof Type</label><select><option>Aadhaar</option><option>PAN</option><option>Passport</option><option>Driving Licence</option></select></div>
+            <div class="ff"><label>ID Number</label><input type="text" placeholder="Enter ID number"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Item Details</div>
+          <div class="form-grid">
+            <div class="ff"><label>Item Type</label><select><option>Ring</option><option>Necklace</option><option>Bangle</option><option>Chain</option><option>Earring</option><option>Other</option></select></div>
+            <div class="ff"><label>Purity (Karat)</label><select id="txKarat" onchange="calcTx()"><option value="8320">24K — Pure Gold</option><option value="7420" selected>22K — Jewelry Grade</option><option value="6080">18K — Common Jewelry</option><option value="4730">14K — Light Jewelry</option></select></div>
+            <div class="ff"><label>Gross Weight (g)</label><input type="number" id="txGross" placeholder="0.00" oninput="calcTx()"></div>
+            <div class="ff"><label>Stone Deduction (g)</label><input type="number" id="txStone" placeholder="0.00" oninput="calcTx()"></div>
+          </div>
+          <div class="calc-result">
+            <div class="calc-result-label">Estimated Offer Price</div>
+            <div class="calc-result-val" id="txOffer">Enter weight above</div>
+            <div class="calc-note">Net weight × Live rate · 5% making charge deducted</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Payment</div>
+          <div class="form-grid">
+            <div class="ff"><label>Payment Mode</label><select><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option></select></div>
+            <div class="ff"><label>Amount to Pay (₹)</label><input type="number" id="txPay" placeholder="Auto-filled from offer"></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn btn-solid" onclick="alert('Transaction saved! Receipt sent to customer.')">✓ Confirm & Save</button>
+            <button class="btn" onclick="alert('Digital receipt generated!')">⬡ Generate Receipt</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECORDS -->
+      <div class="page-view" id="pv-records">
+        <div class="page-header"><div class="page-title">Transaction Records</div><div class="page-sub">All gold purchase records</div></div>
+        <div class="card">
+          <div class="card-header">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select style="font-size:12px;padding:7px 12px;border:1px solid rgba(201,168,76,0.2);background:#111008;color:#c0b090;border-radius:2px"><option>All branches</option><option>Koramangala</option><option>T. Nagar</option><option>Andheri</option></select>
+              <select style="font-size:12px;padding:7px 12px;border:1px solid rgba(201,168,76,0.2);background:#111008;color:#c0b090;border-radius:2px"><option>Today</option><option>This week</option><option>This month</option></select>
+            </div>
+            <button class="btn btn-sm btn-solid">⬇ Export PDF</button>
+          </div>
+          <div class="tbl-wrap"><table>
+            <tr><th>ID</th><th>Date</th><th>Customer</th><th>Item</th><th>Weight</th><th>Karat</th><th>Paid</th><th>Branch</th><th>Staff</th><th>Status</th></tr>
+            <tr><td>#T-1092</td><td>16 Jun</td><td>Meena S.</td><td>Necklace</td><td>18g</td><td>22K</td><td>₹1,21,320</td><td>Koramangala</td><td>Ravi K.</td><td><span class="badge badge-done">Done</span></td></tr>
+            <tr><td>#T-1091</td><td>16 Jun</td><td>Arjun P.</td><td>Ring</td><td>9g</td><td>18K</td><td>₹52,470</td><td>Indiranagar</td><td>Priya M.</td><td><span class="badge badge-done">Done</span></td></tr>
+            <tr><td>#T-1090</td><td>16 Jun</td><td>Sunita R.</td><td>Bangle</td><td>42g</td><td>22K</td><td>₹2,82,960</td><td>Whitefield</td><td>Ravi K.</td><td><span class="badge badge-done">Done</span></td></tr>
+            <tr><td>#T-1089</td><td>16 Jun</td><td>Ramesh V.</td><td>Chain</td><td>58g</td><td>24K</td><td>₹3,89,200</td><td>Koramangala</td><td>Anil T.</td><td><span class="badge badge-flagged">Flagged</span></td></tr>
+            <tr><td>#T-1085</td><td>15 Jun</td><td>Kavitha N.</td><td>Earring</td><td>6g</td><td>22K</td><td>₹40,260</td><td>T. Nagar</td><td>Suresh A.</td><td><span class="badge badge-done">Done</span></td></tr>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- STAFF (Admin only) -->
+      <div class="page-view" id="pv-staff">
+        <div class="page-header"><div class="page-title">Staff Management</div><div class="page-sub">Manage all company staff accounts</div></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-solid" onclick="openAddStaff()">+ Add Staff Member</button>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap"><table>
+            <tr><th>Employee ID</th><th>Name</th><th>Email</th><th>Role</th><th>Branch</th><th>Joined</th><th>Actions</th></tr>
+            <tr><td>WG-ADMIN</td><td>Admin Owner</td><td>admin@whitegold.in</td><td><span class="badge badge-admin2">Admin</span></td><td>Head Office</td><td>Jan 2024</td><td><div class="action-cell"><button class="btn btn-sm">Edit</button></div></td></tr>
+            <tr><td>WG-1001</td><td>Ravi Kumar</td><td>ravi@whitegold.in</td><td><span class="badge badge-manager2">Manager</span></td><td>Koramangala</td><td>Mar 2024</td><td><div class="action-cell"><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-danger" onclick="if(confirm('Remove this staff?'))alert('Staff removed.')">Remove</button></div></td></tr>
+            <tr><td>WG-1002</td><td>Priya Menon</td><td>priya@whitegold.in</td><td><span class="badge badge-manager2">Manager</span></td><td>T. Nagar</td><td>Apr 2024</td><td><div class="action-cell"><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-danger" onclick="if(confirm('Remove this staff?'))alert('Staff removed.')">Remove</button></div></td></tr>
+            <tr><td>WG-1003</td><td>Suresh Babu</td><td>suresh@whitegold.in</td><td><span class="badge badge-manager2">Manager</span></td><td>Andheri</td><td>May 2024</td><td><div class="action-cell"><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-danger" onclick="if(confirm('Remove this staff?'))alert('Staff removed.')">Remove</button></div></td></tr>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- BRANCHES (Admin only) -->
+      <div class="page-view" id="pv-branches">
+        <div class="page-header"><div class="page-title">Branch Management</div><div class="page-sub">Manage all 100+ branches across India</div></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-solid" onclick="openAddBranch()">+ Add New Branch</button>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Total Branches</div><div class="metric-val">100</div></div>
+          <div class="metric"><div class="metric-label">Active Today</div><div class="metric-val" style="color:#5de07a">94</div></div>
+          <div class="metric"><div class="metric-label">States Covered</div><div class="metric-val">18</div></div>
+          <div class="metric"><div class="metric-label">New This Month</div><div class="metric-val">3</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">All Branches</div>
+          <div class="branch-grid" id="branchGrid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page-view" id="pv-reports">
+        <div class="page-header"><div class="page-title">Reports</div><div class="page-sub">Branch and staff performance</div></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">June gold bought</div><div class="metric-val">4.2kg</div></div>
+          <div class="metric"><div class="metric-label">Total payout June</div><div class="metric-val">₹2.8Cr</div></div>
+          <div class="metric"><div class="metric-label">Transactions</div><div class="metric-val">186</div></div>
+          <div class="metric"><div class="metric-label">Top branch</div><div class="metric-val" style="font-size:16px">Koramangala</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Gold by branch (June)</div>
+            <div class="bar-wrap">
+              <div class="bar-row"><div class="bar-label">Koramangala</div><div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div><div class="bar-val">1.74kg</div></div>
+              <div class="bar-row"><div class="bar-label">Indiranagar</div><div class="bar-bg"><div class="bar-fill" style="width:58%"></div></div><div class="bar-val">1.23kg</div></div>
+              <div class="bar-row"><div class="bar-label">Whitefield</div><div class="bar-bg"><div class="bar-fill" style="width:56%"></div></div><div class="bar-val">1.18kg</div></div>
+              <div class="bar-row"><div class="bar-label">T. Nagar</div><div class="bar-bg"><div class="bar-fill" style="width:48%"></div></div><div class="bar-val">1.01kg</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Top staff (June)</div>
+            <div class="bar-wrap">
+              <div class="bar-row"><div class="bar-label">Ravi K.</div><div class="bar-bg"><div class="bar-fill" style="width:90%"></div></div><div class="bar-val">58 txn</div></div>
+              <div class="bar-row"><div class="bar-label">Priya M.</div><div class="bar-bg"><div class="bar-fill" style="width:70%"></div></div><div class="bar-val">45 txn</div></div>
+              <div class="bar-row"><div class="bar-label">Anil T.</div><div class="bar-bg"><div class="bar-fill" style="width:52%"></div></div><div class="bar-val">34 txn</div></div>
+              <div class="bar-row"><div class="bar-label">Suresh B.</div><div class="bar-bg"><div class="bar-fill" style="width:47%"></div></div><div class="bar-val">30 txn</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button class="btn btn-solid" onclick="alert('Monthly PDF report exported!')">⬇ Export Monthly PDF</button>
+          <button class="btn" onclick="alert('Report emailed to owner!')">✉ Email to Owner</button>
+        </div>
+      </div>
+
+      <!-- REVIEWS (Admin only) -->
+      <div class="page-view" id="pv-reviews">
+        <div class="page-header"><div class="page-title">Customer Reviews</div><div class="page-sub">Manage reviews shown on the public website</div></div>
+        <div class="alert alert-info">ℹ Reviews approved here appear on the public website. Delete any fake or inappropriate reviews.</div>
+        <div id="reviewsList"></div>
+      </div>
+
+      <!-- GOLD RATES (Admin only) -->
+      <div class="page-view" id="pv-rates">
+        <div class="page-header"><div class="page-title">Gold Rate Management</div><div class="page-sub">Set buying rates — pushed to all 100+ branches instantly</div></div>
+        <div class="alert alert-warning">⚠ Changing these rates will update the live ticker and calculator on the public website immediately.</div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Current Buying Rates</div>
+          <div class="form-grid">
+            <div class="ff"><label>24K Rate (per gram)</label><input type="number" value="8320" id="r24"></div>
+            <div class="ff"><label>22K Rate (per gram)</label><input type="number" value="7420" id="r22"></div>
+            <div class="ff"><label>18K Rate (per gram)</label><input type="number" value="6080" id="r18"></div>
+            <div class="ff"><label>14K Rate (per gram)</label><input type="number" value="4730" id="r14"></div>
+          </div>
+          <button class="btn btn-solid" onclick="alert('Rates updated and pushed to all branches!')">⚡ Update All Branches Now</button>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /shell -->
+</div><!-- /app -->
+
+<!-- ADD STAFF MODAL -->
+<div class="modal-overlay" id="addStaffModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addStaffModal')">✕</button>
+    <div class="modal-title">Add New Staff Member</div>
+    <div class="modal-sub">They will receive a login invite by email</div>
+    <div class="form-grid">
+      <div class="ff"><label>Full Name</label><input type="text" placeholder="e.g. Ravi Kumar"></div>
+      <div class="ff"><label>Employee ID</label><input type="text" placeholder="e.g. WG-1010"></div>
+      <div class="ff"><label>Email</label><input type="email" placeholder="ravi@whitegold.in"></div>
+      <div class="ff"><label>Role</label><select><option>manager</option><option>admin</option></select></div>
+      <div class="ff" style="grid-column:1/-1"><label>Branch</label><select><option>Head Office</option><option>Bengaluru — Koramangala</option><option>Mumbai — Andheri</option><option>Chennai — T. Nagar</option></select></div>
+    </div>
+    <button class="btn btn-solid" style="width:100%;margin-top:4px" onclick="alert('Staff account created! Invite email sent.');closeModal('addStaffModal')">Create Account & Send Invite</button>
+  </div>
+</div>
+
+<!-- ADD BRANCH MODAL -->
+<div class="modal-overlay" id="addBranchModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addBranchModal')">✕</button>
+    <div class="modal-title">Add New Branch</div>
+    <div class="modal-sub">Branch goes live on public website immediately</div>
+    <div class="form-grid">
+      <div class="ff"><label>City</label><input type="text" placeholder="e.g. Jaipur"></div>
+      <div class="ff"><label>Area / Locality</label><input type="text" placeholder="e.g. MI Road"></div>
+      <div class="ff"><label>State</label><input type="text" placeholder="e.g. Rajasthan"></div>
+      <div class="ff"><label>Manager</label><select><option>Assign later</option><option>Ravi Kumar</option><option>Priya Menon</option></select></div>
+      <div class="ff" style="grid-column:1/-1"><label>Full Address</label><input type="text" placeholder="Shop no, Street, City, PIN"></div>
+    </div>
+    <button class="btn btn-solid" style="width:100%;margin-top:4px" onclick="alert('Branch added! Now live on public website.');closeModal('addBranchModal')">Add Branch</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// SUPABASE CONFIG — Replace with yours
+// ══════════════════════════════════════
+const SUPABASE_URL = 'https://rgrdmmgtwmifliqrfyrt.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_Wk8lUTl-7vs9JCH8Ng_YNA_SJbxoCgX'
+
+// ── INIT ──
+let supabase_client = null
+let currentUser = null
+let currentRole = null
+
+window.addEventListener('DOMContentLoaded', async () => {
+  setTimeout(async () => {
+    document.getElementById('loadingScreen').style.display = 'none'
+    document.body.style.background = '#0f0d04'
+
+    // Check if Supabase is configured
+    if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_URL.includes('supabase.co')) {
+      document.getElementById('setupNotice').style.display = 'block'
+      return
+    }
+
+    try {
+      if (typeof supabase === 'undefined') throw new Error('Supabase library not loaded')
+      supabase_client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+      const { data: { session } } = await supabase_client.auth.getSession()
+      if (session) {
+        await loadUserProfile(session.user)
+      } else {
+        document.getElementById('loginPage').style.display = 'flex'
+      }
+    } catch(e) {
+      console.error('GoldDesk error:', e)
+      // Still show login page so user can try
+      document.getElementById('loginPage').style.display = 'flex'
+    }
+  }, 200)
+})
+
+// ── LOGIN ──
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim()
+  const pass  = document.getElementById('loginPass').value
+  const empId = document.getElementById('empId').value.trim()
+  const branch = document.getElementById('branchSel').value
+  const btn   = document.getElementById('loginBtn')
+  const err   = document.getElementById('loginError')
+
+  if (!email || !pass || !empId || !branch) {
+    showError('Please fill in all fields.')
+    return
+  }
+
+  btn.disabled = true
+  btn.textContent = 'Signing in...'
+  err.style.display = 'none'
+
+  try {
+    const { data, error } = await supabase_client.auth.signInWithPassword({ email, password: pass })
+    if (error) throw error
+
+    // Verify employee ID matches — case insensitive
+    const { data: staff, error: staffErr } = await supabase_client
+      .from('staff').select('*')
+      .eq('employee_id', empId.trim().toUpperCase())
+      .eq('email', email.trim().toLowerCase())
+      .single()
+    
+    // If RLS blocks the query, try without email filter as fallback
+    if (staffErr || !staff) {
+      const { data: staff2, error: staffErr2 } = await supabase_client
+        .from('staff').select('*')
+        .eq('employee_id', empId.trim().toUpperCase())
+        .single()
+      if (staffErr2 || !staff2) {
+        console.error('Staff query error:', staffErr || staffErr2)
+        throw new Error('Employee ID not found. Please check and try again.')
+      }
+      if (staff2.email.toLowerCase() !== email.trim().toLowerCase()) {
+        throw new Error('Email does not match this Employee ID.')
+      }
+      await loadUserProfile(data.user, staff2)
+      return
+    }
+
+    await loadUserProfile(data.user, staff)
+  } catch(e) {
+    showError(e.message || 'Login failed. Please check your details.')
+    btn.disabled = false
+    btn.textContent = 'Sign In to GoldDesk'
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('loginError')
+  el.textContent = msg
+  el.style.display = 'block'
+}
+
+async function loadUserProfile(user, staffData = null) {
+  if (!staffData) {
+    const { data } = await supabase_client.from('staff').select('*').eq('email', user.email).single()
+    staffData = data
+  }
+  if (!staffData) { showError('Staff profile not found.'); return }
+
+  currentUser = { ...user, ...staffData }
+  currentRole = staffData.role
+  launchApp()
+}
+
+function launchApp() {
+  document.getElementById('loginPage').style.display = 'none'
+  document.getElementById('app').style.display = 'flex'
+  document.getElementById('app').style.flexDirection = 'column'
+
+  // Set sidebar info
+  const initials = currentUser.full_name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
+  document.getElementById('sbAvatar').textContent = initials
+  document.getElementById('sbName').textContent = currentUser.full_name
+  document.getElementById('sbBranch').textContent = currentUser.branch
+
+  const badge = document.getElementById('sbRoleBadge')
+  badge.textContent = currentRole === 'admin' ? 'Admin — Owner' : 'Manager'
+  badge.className = 'role-badge ' + (currentRole === 'admin' ? 'badge-admin' : 'badge-manager')
+
+  // Show/hide admin-only items
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = currentRole === 'admin' ? 'flex' : 'none'
+  })
+
+  initApp()
+}
+
+async function doLogout() {
+  if (supabase_client) await supabase_client.auth.signOut()
+  location.reload()
+}
+
+// ── NAV ──
+function nav(page, el) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'))
+  const pv = document.getElementById('pv-' + page)
+  if (pv) pv.classList.add('active')
+  if (el) el.classList.add('active')
+  const titles = {dashboard:'Dashboard',transaction:'New Transaction',records:'Records',staff:'Staff Management',branches:'Branch Management',reports:'Reports',reviews:'Customer Reviews',rates:'Gold Rate Management'}
+  document.getElementById('topBarTitle').textContent = titles[page] || page
+}
+
+// ── TRANSACTION CALC ──
+function calcTx() {
+  const rate = parseFloat(document.getElementById('txKarat').value) || 0
+  const gross = parseFloat(document.getElementById('txGross').value) || 0
+  const stone = parseFloat(document.getElementById('txStone').value) || 0
+  const net = Math.max(0, gross - stone)
+  const offer = document.getElementById('txOffer')
+  const pay = document.getElementById('txPay')
+  if (net > 0) {
+    const val = Math.round(net * rate * 0.95)
+    offer.textContent = '₹' + val.toLocaleString('en-IN')
+    pay.value = val
+  } else {
+    offer.textContent = 'Enter weight above'
+  }
+}
+
+// ── MODALS ──
+function openAddStaff() { document.getElementById('addStaffModal').classList.add('open') }
+function openAddBranch() { document.getElementById('addBranchModal').classList.add('open') }
+function closeModal(id) { document.getElementById(id).classList.remove('open') }
+
+// ── BRANCHES LIST ──
+const BRANCHES = [
+  {city:'Bengaluru',area:'Koramangala',state:'Karnataka'},
+  {city:'Bengaluru',area:'Indiranagar',state:'Karnataka'},
+  {city:'Bengaluru',area:'Whitefield',state:'Karnataka'},
+  {city:'Mumbai',area:'Andheri',state:'Maharashtra'},
+  {city:'Mumbai',area:'Borivali',state:'Maharashtra'},
+  {city:'Chennai',area:'T. Nagar',state:'Tamil Nadu'},
+  {city:'Chennai',area:'Anna Nagar',state:'Tamil Nadu'},
+  {city:'Hyderabad',area:'Banjara Hills',state:'Telangana'},
+  {city:'Hyderabad',area:'Secunderabad',state:'Telangana'},
+  {city:'Delhi',area:'Connaught Place',state:'Delhi'},
+  {city:'Pune',area:'Koregaon Park',state:'Maharashtra'},
+  {city:'Kochi',area:'MG Road',state:'Kerala'},
+  {city:'Ahmedabad',area:'CG Road',state:'Gujarat'},
+  {city:'Jaipur',area:'MI Road',state:'Rajasthan'},
+  {city:'Coimbatore',area:'RS Puram',state:'Tamil Nadu'},
+  {city:'Mysuru',area:'Vijayanagar',state:'Karnataka'},
+  {city:'Lucknow',area:'Hazratganj',state:'UP'},
+  {city:'Nagpur',area:'Sitabuldi',state:'Maharashtra'},
+]
+
+// ── REVIEWS LIST ──
+const REVIEWS = [
+  {stars:5,text:'I walked in nervous. The staff showed me the live rate and I left with cash in 20 minutes.',name:'Meena Krishnaswamy',city:'Bengaluru',approved:true},
+  {stars:5,text:'Purity test done right in front of me. No tricks, no pressure. Best rate I found.',name:'Suresh Patel',city:'Ahmedabad',approved:true},
+  {stars:5,text:'₹1.2 lakh transferred to my account in under 10 minutes. Exceptional service.',name:'Kavitha Reddy',city:'Hyderabad',approved:true},
+  {stars:4,text:'Good experience overall. Staff were professional.',name:'Dinesh R.',city:'Chennai',approved:false},
+  {stars:5,text:'Third visit to White Gold. Every time the same — fast, fair, friendly.',name:'Anita Shah',city:'Mumbai',approved:true},
+]
+
+function initApp() {
+  // Populate branches
+  const bg = document.getElementById('branchGrid')
+  if (bg) {
+    bg.innerHTML = BRANCHES.map(b => `
+      <div class="branch-card">
+        <div><div class="branch-name">${b.city} — ${b.area}</div><div class="branch-state">${b.state}</div></div>
+        <button class="btn btn-sm btn-danger" onclick="if(confirm('Remove ${b.city} ${b.area} branch?'))this.closest('.branch-card').remove()">✕</button>
+      </div>`).join('')
+  }
+
+  // Load pending reviews from website visitors + hardcoded ones
+  loadAllReviews()
+
+  // Live clock
+  setInterval(() => {
+    const t = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})
+    const el1 = document.getElementById('appTime'); if(el1) el1.innerHTML = '<b>Live</b>'+t
+    const el2 = document.getElementById('appTime2'); if(el2) el2.innerHTML = '<b>Live</b>'+t
+    const tt = document.getElementById('topTime'); if(tt) tt.textContent = t
+  }, 1000)
+
+  // Date in dashboard
+  const dd = document.getElementById('dashDate')
+  if (dd) {
+    const d = new Date()
+    dd.textContent = d.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' · Live gold rate: ₹7,420/g (22K)'
+  }
+}
+
+// Escape user-submitted text before injecting into innerHTML (prevents XSS).
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]
+  ))
+}
+
+function getPendingReviews() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem('pendingReviews') || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function loadAllReviews() {
+  const rl = document.getElementById('reviewsList')
+  if (!rl) return
+
+  // Website-submitted reviews (editable) first, then hardcoded showcase reviews.
+  const pending = getPendingReviews()
+  const allReviews = [
+    ...pending.map((r, idx) => ({ ...r, source: 'pending', pendingIdx: idx })),
+    ...REVIEWS.map(r => ({ ...r, source: 'approved', pendingIdx: -1 }))
+  ]
+
+  if (allReviews.length === 0) {
+    rl.innerHTML = '<p style="color:var(--ink3);font-size:13px;padding:20px 0">No reviews yet.</p>'
+    return
+  }
+
+  rl.innerHTML = allReviews.map(r => {
+    const stars = Math.max(0, Math.min(5, Number(r.stars) || 0))
+    const isPublished = r.approved !== false
+    return `
+    <div class="review-card">
+      <div style="flex:1">
+        <div class="review-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>
+        ${r.source === 'pending' ? '<span style="font-size:10px;background:rgba(30,110,58,0.2);color:#5de07a;padding:2px 8px;border-radius:10px;letter-spacing:0.08em">FROM WEBSITE</span>' : ''}
+        <div class="review-text" style="margin-top:8px">"${escapeHtml(r.text)}"</div>
+        <div class="review-author">${escapeHtml(r.name)} <span class="review-city">· ${escapeHtml(r.city || 'India')}</span></div>
+        ${r.date ? `<div style="font-size:10px;color:var(--ink3);margin-top:4px">${escapeHtml(r.date)}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <span class="badge ${isPublished ? 'badge-done' : 'badge-pending'}">${isPublished ? 'Published' : 'Pending'}</span>
+        <button class="btn btn-sm btn-danger" onclick="deleteReview(${r.pendingIdx})">Delete</button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+// pendingIdx >= 0 → a website review stored in localStorage; -1 → a hardcoded showcase review.
+function deleteReview(pendingIdx) {
+  if (!confirm('Delete this review permanently?')) return
+  if (pendingIdx >= 0) {
+    const pending = getPendingReviews()
+    pending.splice(pendingIdx, 1)
+    localStorage.setItem('pendingReviews', JSON.stringify(pending))
+  }
+  // Re-render from the source of truth so remaining indices stay correct.
+  loadAllReviews()
+}
+</script>
+</body>
+</html>

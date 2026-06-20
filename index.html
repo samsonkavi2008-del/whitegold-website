@@ -26,7 +26,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);overfl
 @keyframes tick{to{transform:translateX(-50%)}}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(14,12,4,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(10,8,2,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
 .logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:#F5E6C0;letter-spacing:0.07em;cursor:pointer}
 .logo span{color:var(--g1)}
 .nav-links{display:flex;gap:32px;list-style:none}
@@ -38,13 +38,14 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 .nav-btn:hover{background:var(--g4)}
 
 /* PAGES */
-.page{display:none}.page.active{display:block}
+.page{display:none}.page.active{display:block;position:relative;z-index:1;background:transparent}
 
 /* ═══ HERO ═══ */
-.hero{position:relative;min-height:94vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#111008}
+.hero{position:relative;min-height:94vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:transparent;z-index:1}
 #hero3d{position:absolute;inset:0;z-index:0}
-.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 40% 60%,rgba(201,168,76,0.07) 0%,transparent 60%);z-index:1}
+.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(201,168,76,0.05) 0%,transparent 65%);z-index:1}
 .hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 80px;max-width:900px;width:100%}
+.hero-left{}
 .hero-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:7px 18px;font-size:11px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:#d4af6a;margin-bottom:28px}
 .hero-badge::before{content:'◆';font-size:7px;color:var(--g1)}
 .hero h1{font-family:'Cormorant Garamond',serif;font-size:62px;font-weight:300;line-height:1.07;color:#F5E6C0;margin-bottom:20px}
@@ -68,18 +69,18 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 #ringCanvas{width:100%;max-width:420px;height:420px;display:block;border-radius:4px}
 
 /* ═══ DIVIDER ═══ */
-.ornament{text-align:center;padding:40px 0;color:var(--g1);font-size:22px;letter-spacing:16px;opacity:0.4;background:var(--bg)}
+.ornament{text-align:center;padding:40px 0;color:var(--g1);font-size:22px;letter-spacing:16px;opacity:0.4;background:transparent}
 
 /* ═══ SECTIONS ═══ */
-.section{padding:90px 80px;background:var(--bg)}
-.section-alt{background:var(--bg2)}
+.section{padding:90px 80px;background:transparent;position:relative;z-index:1}
+.section-alt{background:transparent}
 .eyebrow{font-size:11px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--g1);margin-bottom:14px}
 .sec-title{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;line-height:1.12;color:var(--ink);margin-bottom:18px}
 .sec-body{font-size:14.5px;color:#9a8a6a;line-height:1.85;font-weight:300;max-width:540px}
 
 /* WHY CARDS */
 .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:52px}
-.why-card{background:var(--bg2);border:1px solid var(--border);padding:36px 30px;transition:all 0.35s;position:relative;overflow:hidden}
+.why-card{background:rgba(24,21,8,0.75);border:1px solid var(--border);padding:36px 30px;transition:all 0.35s;position:relative;overflow:hidden;backdrop-filter:blur(4px)}
 .why-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:0;background:var(--g1);transition:height 0.35s}
 .why-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(201,168,76,0.12)}
 .why-card:hover::before{height:100%}
@@ -98,7 +99,7 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 
 /* RATES */
 .rates-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);margin-top:48px}
-.rate-card{background:var(--bg2);padding:36px 24px;text-align:center;transition:all 0.3s}
+.rate-card{background:rgba(24,21,8,0.75);padding:36px 24px;text-align:center;transition:all 0.3s;backdrop-filter:blur(4px)}
 .rate-card:hover{background:var(--bg3);transform:translateY(-3px)}
 .rk{font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
 .rp{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--g2)}
@@ -107,7 +108,7 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 
 /* TESTIMONIALS */
 .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
-.tcard{background:var(--bg2);border:1px solid var(--border);padding:32px;transition:all 0.3s}
+.tcard{background:rgba(24,21,8,0.75);border:1px solid var(--border);padding:32px;transition:all 0.3s;backdrop-filter:blur(4px)}
 .tcard:hover{border-color:var(--g1);transform:translateY(-4px);box-shadow:0 16px 40px rgba(201,168,76,0.1)}
 .tq{font-family:'Cormorant Garamond',serif;font-size:52px;color:var(--g3);line-height:0.6;margin-bottom:14px}
 .tstars{color:var(--g1);font-size:13px;margin-bottom:10px;letter-spacing:3px}
@@ -120,13 +121,13 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 .bpill{font-size:12px;padding:8px 20px;border:1px solid var(--border);color:#9a8a6a;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em}
 .bpill:hover{border-color:var(--g1);color:var(--g1);background:var(--bg3)}
 .branch-search{display:flex;gap:0;max-width:460px;margin-top:40px}
-.branch-search input{flex:1;padding:14px 18px;border:1.5px solid var(--border);font-size:14px;font-family:'Inter',sans-serif;outline:none;background:var(--bg2);color:#F5E6C0}
+.branch-search input{flex:1;padding:14px 18px;border:1.5px solid var(--border);font-size:14px;font-family:'Inter',sans-serif;outline:none;background:rgba(24,21,8,0.75);color:#F5E6C0}
 .branch-search input:focus{border-color:var(--g1)}
 .branch-search button{padding:14px 28px;background:var(--g1);color:#fff;border:none;font-size:12.5px;font-weight:500;letter-spacing:0.08em;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s}
 .branch-search button:hover{background:var(--g4)}
 
 /* CALC */
-.calc-box{background:var(--bg2);border:1px solid var(--border);padding:40px;max-width:520px;margin-top:48px}
+.calc-box{background:rgba(24,21,8,0.75);border:1px solid var(--border);padding:40px;max-width:520px;margin-top:48px;backdrop-filter:blur(4px)}
 .calc-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .cfield label{display:block;font-size:11px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
 .cfield input,.cfield select{width:100%;padding:12px 16px;border:1.5px solid var(--border);font-size:14px;font-family:'Inter',sans-serif;color:#F5E6C0;background:var(--bg);outline:none;transition:border-color 0.2s;appearance:none}
@@ -138,7 +139,7 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 
 /* FAQ */
 .faq-wrap{max-width:720px;margin:48px auto 0}
-.faq-item{border-bottom:1px solid var(--border)}
+.faq-item{border-bottom:1px solid var(--border);background:transparent}
 .faq-q{padding:22px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:15px;font-weight:400;color:#F5E6C0;transition:color 0.2s;font-family:'Cormorant Garamond',serif;letter-spacing:0.02em}
 .faq-q:hover{color:var(--g1)}
 .faq-ico{font-size:22px;color:var(--g1);transition:transform 0.3s;font-weight:300;font-family:'Inter',sans-serif}
@@ -148,7 +149,7 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 
 /* CAREERS */
 .jobs{display:flex;flex-direction:column;gap:2px;margin-top:48px}
-.job{background:var(--bg2);border:1px solid var(--border);padding:26px 32px;display:flex;justify-content:space-between;align-items:center;transition:all 0.25s;cursor:pointer}
+.job{background:rgba(24,21,8,0.75);border:1px solid var(--border);padding:26px 32px;display:flex;justify-content:space-between;align-items:center;transition:all 0.25s;cursor:pointer;backdrop-filter:blur(4px)}
 .job:hover{border-color:var(--g1);background:var(--bg3);transform:translateX(4px)}
 .jtitle{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--ink);margin-bottom:7px}
 .jmeta{font-size:12px;color:var(--ink3);display:flex;gap:20px}
@@ -161,7 +162,7 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 .ci-lbl{font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--g1);margin-bottom:8px}
 .ci-val{font-family:'Cormorant Garamond',serif;font-size:20px;color:#F5E6C0}
 .ci-sub{font-size:13px;color:var(--ink3);margin-top:3px;font-weight:300}
-.cform{background:var(--bg2);border:1px solid var(--border);padding:40px}
+.cform{background:rgba(24,21,8,0.75);border:1px solid var(--border);padding:40px;backdrop-filter:blur(4px)}
 .ff{margin-bottom:18px}
 .ff label{display:block;font-size:11px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px}
 .ff input,.ff textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);font-size:14px;font-family:'Inter',sans-serif;color:#F5E6C0;background:var(--bg);outline:none;transition:border-color 0.2s;resize:vertical}
@@ -169,8 +170,8 @@ nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:cente
 .ff-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
 /* LOGIN */
-.login-outer{min-height:80vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:60px 24px}
-.login-card{background:var(--bg2);border:1px solid var(--border);padding:56px 48px;max-width:440px;width:100%;box-shadow:0 28px 60px rgba(201,168,76,0.12);position:relative}
+.login-outer{min-height:80vh;display:flex;align-items:center;justify-content:center;background:transparent;padding:60px 24px}
+.login-card{background:rgba(24,21,8,0.85);border:1px solid var(--border);padding:56px 48px;max-width:440px;width:100%;box-shadow:0 28px 60px rgba(201,168,76,0.12);position:relative;backdrop-filter:blur(8px)}
 .login-card::before{content:'◆ ◆ ◆';position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--g1);color:rgba(255,255,255,0.7);font-size:8px;letter-spacing:6px;padding:4px 16px}
 .login-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:#F5E6C0;text-align:center;margin-bottom:5px;margin-top:12px}
 .login-sub{font-size:13px;color:var(--ink3);text-align:center;margin-bottom:36px;font-weight:300}
@@ -200,12 +201,42 @@ footer{background:#0d0b04;padding:64px 80px 32px;border-top:1px solid rgba(201,1
 .reveal-delay-1{transition-delay:0.1s}
 .reveal-delay-2{transition-delay:0.2s}
 .reveal-delay-3{transition-delay:0.3s}
+
+/* Jewelry float animation */
+.jewelry-float{display:inline-block;animation:jewelFloat 5s ease-in-out infinite;transition:transform 0.3s}
+.jewelry-float:hover{transform:scale(1.15)!important}
+@keyframes jewelFloat{0%,100%{transform:translateY(0) rotate(-2deg)}25%{transform:translateY(-14px) rotate(2deg)}50%{transform:translateY(-8px) rotate(-1deg)}75%{transform:translateY(-18px) rotate(3deg)}}
+
+/* Review ticker */
+.rtick-item{display:inline-flex;flex-direction:column;padding:0 36px;min-width:340px;max-width:340px;vertical-align:top}
+.rtick-stars{color:#C9A84C;font-size:13px;letter-spacing:3px;margin-bottom:6px}
+.rtick-text{font-size:13px;color:#9a8a6a;font-style:italic;line-height:1.6;font-family:'Cormorant Garamond',Georgia,serif}
+.rtick-author{font-size:11px;color:#C9A84C;margin-top:8px;font-weight:500;letter-spacing:0.06em}
+.rtick-sep{display:inline-flex;align-items:center;color:rgba(201,168,76,0.25);font-size:18px;padding:0 16px;align-self:center}
+@keyframes reviewScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+#review-ticker:hover{animation-play-state:paused}
+
+
+/* Chain wave section */
+.chain-section{position:relative;z-index:2;width:100%;overflow:hidden;height:110px}
+#chainCanvas{position:absolute;inset:0;width:100%;height:100%}
+.chain-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.chain-label span{font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;color:rgba(201,168,76,0.5);letter-spacing:0.28em;text-transform:uppercase}
+
 </style>
 </head>
 <body>
 
 <!-- TICKER -->
-<div class="ticker">
+
+
+
+
+
+<!-- 3D Particle Background -->
+<canvas id="bgCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none"></canvas>
+
+<div class="ticker" style="position:relative;z-index:100">
   <div class="ticker-track" id="tickerTrack">
     <span class="t-item"><b>24K Gold</b>₹8,320/g</span>
     <span class="t-item"><b>22K Gold</b>₹7,420/g</span>
@@ -245,6 +276,7 @@ footer{background:#0d0b04;padding:64px 80px 32px;border-top:1px solid rgba(201,1
 
   <div class="hero">
     <canvas id="hero3d"></canvas>
+    <canvas id="blobCanvas" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;opacity:0.85"></canvas>
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <div class="hero-left">
@@ -265,7 +297,144 @@ footer{background:#0d0b04;padding:64px 80px 32px;border-top:1px solid rgba(201,1
     </div>
   </div>
 
+      <!-- Floating Jewelry Showcase -->
+      <div style="position:relative;z-index:2;width:100%;padding:48px 0 36px;text-align:center">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#5a4a2a;margin-bottom:32px">We buy all types of jewelry</div>
+        <div style="display:flex;justify-content:center;align-items:flex-end;gap:32px;flex-wrap:wrap">
+
+          <div class="jewelry-float" style="animation-delay:0s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">💍</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Rings</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">14K · 18K · 22K · 24K</div>
+          </div>
+
+          <div class="jewelry-float" style="animation-delay:0.6s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">📿</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Necklaces</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">All weights accepted</div>
+          </div>
+
+          <div class="jewelry-float" style="animation-delay:1.2s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">⭕</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Bangles</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">Any condition</div>
+          </div>
+
+          <div class="jewelry-float" style="animation-delay:1.8s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">🔗</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Chains</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">All lengths & styles</div>
+          </div>
+
+          <div class="jewelry-float" style="animation-delay:2.4s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">✨</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Earrings</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">Studs & danglers</div>
+          </div>
+
+          <div class="jewelry-float" style="animation-delay:3.0s;text-align:center">
+            <div style="font-size:52px;filter:sepia(1) hue-rotate(5deg) saturate(4) brightness(0.8)">💛</div>
+            <div style="margin-top:10px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;font-weight:500">Broken pieces</div>
+            <div style="font-size:10px;color:#4a3a1a;margin-top:2px">Old & damaged too</div>
+          </div>
+
+        </div>
+        <div style="margin-top:28px;font-size:13px;color:#5a4a2a;font-style:italic;font-family:'Cormorant Garamond',Georgia,serif">Any karat · Any condition · Any quantity — walk in, we buy it all</div>
+      </div>
+
   <div class="ornament">◆ ◇ ◆ ◇ ◆</div>
+
+
+      <!-- Auto-scrolling Testimonials Ticker -->
+      <div style="position:relative;z-index:2;width:100%;overflow:hidden;padding:28px 0;border-top:1px solid rgba(201,168,76,0.12);border-bottom:1px solid rgba(201,168,76,0.12);background:rgba(10,8,2,0.5)">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#5a4a2a;text-align:center;margin-bottom:20px">What our customers say</div>
+        <div style="overflow:hidden;width:100%">
+          <div id="review-ticker" style="display:flex;gap:0;width:max-content;animation:reviewScroll 40s linear infinite">
+
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"I walked in nervous. Staff showed me the live rate and I left with cash in 20 minutes."</div>
+              <div class="rtick-author">— Meena K., Bengaluru</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Purity test done right in front of me. No tricks. Best rate I found after checking three places."</div>
+              <div class="rtick-author">— Suresh P., Ahmedabad</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"₹1.2 lakh transferred to my account in under 10 minutes. WhatsApp receipt came instantly."</div>
+              <div class="rtick-author">— Kavitha R., Hyderabad</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Very transparent. Showed me exactly how the price was calculated. No surprises at all."</div>
+              <div class="rtick-author">— Ramesh V., Delhi</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Third visit to White Gold. Every single time the experience is identical — fast, fair, friendly."</div>
+              <div class="rtick-author">— Anita S., Mumbai</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Received WhatsApp receipt instantly. Professional and fast. I recommended White Gold to all my family."</div>
+              <div class="rtick-author">— Priya N., Kochi</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+
+            <!-- Duplicate for seamless loop -->
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"I walked in nervous. Staff showed me the live rate and I left with cash in 20 minutes."</div>
+              <div class="rtick-author">— Meena K., Bengaluru</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Purity test done right in front of me. No tricks. Best rate I found after checking three places."</div>
+              <div class="rtick-author">— Suresh P., Ahmedabad</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"₹1.2 lakh transferred to my account in under 10 minutes. WhatsApp receipt came instantly."</div>
+              <div class="rtick-author">— Kavitha R., Hyderabad</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Very transparent. Showed me exactly how the price was calculated. No surprises at all."</div>
+              <div class="rtick-author">— Ramesh V., Delhi</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Third visit to White Gold. Every single time the experience is identical — fast, fair, friendly."</div>
+              <div class="rtick-author">— Anita S., Mumbai</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+            <div class="rtick-item">
+              <div class="rtick-stars">★★★★★</div>
+              <div class="rtick-text">"Received WhatsApp receipt instantly. Professional and fast. I recommended White Gold to all my family."</div>
+              <div class="rtick-author">— Priya N., Kochi</div>
+            </div>
+            <div class="rtick-sep">◆</div>
+          </div>
+        </div>
+      </div>
+
+
+  <!-- Golden Chain Wave -->
+  <div class="chain-section">
+    <canvas id="chainCanvas"></canvas>
+    <div class="chain-label"><span>◆ &nbsp; Crafted with trust since 2004 &nbsp; ◆</span></div>
+  </div>
 
   <!-- WHY -->
   <div class="section reveal">
@@ -560,6 +729,253 @@ function submitComment(){
   setTimeout(() => msg.style.display = 'none', 4000);
 }
 
+
+// ── LIVE GOLD COUNTER ──
+(function(){
+  let grams = 342, txns = 12, rate = 7420;
+  const baseRate = 7420;
+
+  function flash(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.color = '#ffffff';
+    setTimeout(() => el.style.color = '#E8C96A', 300);
+  }
+
+  function updateCounter(){
+    // Grams increase by 1-4 every few seconds
+    const addGrams = Math.floor(Math.random()*3)+1;
+    grams += addGrams;
+    const amount = (grams * rate * 0.95 / 100000).toFixed(1);
+    txns += (Math.random() > 0.6 ? 1 : 0);
+
+    // Update rate with small fluctuation
+    rate = Math.round(baseRate + (Math.random()-0.5)*0.006*baseRate);
+    const pct = ((rate - baseRate)/baseRate*100).toFixed(2);
+    const arrow = rate >= baseRate ? '▲' : '▼';
+    const rateColor = rate >= baseRate ? '#5de07a' : '#e05d5d';
+
+    const gEl = document.getElementById('ctr-grams');
+    const aEl = document.getElementById('ctr-amount');
+    const rEl = document.getElementById('ctr-rate');
+    const tEl = document.getElementById('ctr-txn');
+    const rcEl = document.getElementById('ctr-rate-chg');
+
+    if(gEl){ gEl.textContent = grams; flash('ctr-grams'); }
+    if(aEl){ aEl.textContent = amount; flash('ctr-amount'); }
+    if(rEl){ rEl.textContent = rate.toLocaleString('en-IN'); flash('ctr-rate'); }
+    if(tEl) tEl.textContent = txns + ' transactions today';
+    if(rcEl){ rcEl.textContent = arrow + ' ' + Math.abs(pct) + '% today'; rcEl.style.color = rateColor; }
+  }
+
+  // Add pulse animation keyframe
+  const style = document.createElement('style');
+  style.textContent = '@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.3)}}';
+  document.head.appendChild(style);
+
+  setInterval(updateCounter, 2800);
+})();
+
+
+// ── GOLDEN CHAIN WAVE ──
+(function(){
+  const canvas = document.getElementById('chainCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize(){
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    const rows = 5;
+    const linkSize = 9;
+    const spacing = 18;
+
+    for(let row = 0; row < rows; row++){
+      const yBase = H * 0.12 + row * (H * 0.19);
+      const phase = row * 0.9 + t;
+      const amp = 14 + row * 3;
+      const speed = 1 + row * 0.2;
+      const alpha = 0.15 + (row === 2 ? 0.35 : row === 1 || row === 3 ? 0.22 : 0.12);
+
+      let prevX = null, prevY = null;
+      for(let i = 0; i <= W; i += spacing){
+        const y = yBase + Math.sin((i / W) * Math.PI * 5 + phase * speed) * amp
+                        + Math.cos((i / W) * Math.PI * 3 + phase * 0.7) * (amp * 0.4);
+        const brightness = (Math.sin((i / W) * Math.PI * 4 + t) + 1) / 2;
+        const op = alpha * (0.5 + 0.5 * brightness);
+
+        // Draw link connector
+        if(prevX !== null){
+          ctx.beginPath();
+          ctx.moveTo(prevX, prevY);
+          ctx.lineTo(i, y);
+          ctx.strokeStyle = `rgba(201,168,76,${op * 0.6})`;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        // Draw chain link bead
+        const g = ctx.createRadialGradient(i, y, 0, i, y, linkSize);
+        g.addColorStop(0, `rgba(245,220,100,${op * 1.2})`);
+        g.addColorStop(0.4, `rgba(201,168,76,${op * 0.7})`);
+        g.addColorStop(1, 'rgba(139,100,20,0)');
+        ctx.beginPath();
+        ctx.arc(i, y, linkSize * 0.55, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // Occasional sparkle on brightest beads
+        if(brightness > 0.85 && row === 2){
+          ctx.save();
+          ctx.globalAlpha = (brightness - 0.85) * 4 * alpha * 2;
+          ctx.strokeStyle = 'rgba(255,248,200,0.9)';
+          ctx.lineWidth = 0.7;
+          const sz = 4;
+          ctx.beginPath(); ctx.moveTo(i-sz*2,y); ctx.lineTo(i+sz*2,y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(i,y-sz*2); ctx.lineTo(i,y+sz*2); ctx.stroke();
+          ctx.restore();
+        }
+
+        prevX = i; prevY = y;
+      }
+    }
+
+    t += 0.022;
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+
+// ── MORPHING GOLD BLOB ──
+(function(){
+  const canvas = document.getElementById('blobCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  const SIZE = 520;
+  canvas.width = SIZE; canvas.height = SIZE;
+  const cx = SIZE/2, cy = SIZE/2;
+
+  function drawBlob(){
+    ctx.clearRect(0,0,SIZE,SIZE);
+
+    // Outer ambient glow ring
+    const outerGlow = ctx.createRadialGradient(cx,cy,100,cx,cy,240);
+    outerGlow.addColorStop(0,'rgba(201,168,76,0.06)');
+    outerGlow.addColorStop(0.5,'rgba(201,168,76,0.03)');
+    outerGlow.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.beginPath(); ctx.arc(cx,cy,240,0,Math.PI*2);
+    ctx.fillStyle=outerGlow; ctx.fill();
+
+    // Main morphing blob
+    const points = 12;
+    const baseR = 115;
+    ctx.beginPath();
+    for(let i=0;i<=points*3;i++){
+      const angle=(i/points)*Math.PI*2;
+      const r = baseR
+        + Math.sin(angle*3 + t*1.1)*18
+        + Math.cos(angle*2 + t*0.7)*12
+        + Math.sin(angle*5 + t*1.4)*7
+        + Math.cos(angle*4 + t*0.9)*9
+        + Math.sin(t*0.5)*10; // breathing
+      const x = cx + r*Math.cos(angle);
+      const y = cy + r*Math.sin(angle);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+
+    // Rich gold gradient fill
+    const grad = ctx.createRadialGradient(cx-30,cy-30,10,cx,cy,baseR+25);
+    grad.addColorStop(0,'rgba(255,240,120,0.28)');
+    grad.addColorStop(0.25,'rgba(232,200,80,0.22)');
+    grad.addColorStop(0.5,'rgba(201,168,76,0.18)');
+    grad.addColorStop(0.75,'rgba(160,120,30,0.12)');
+    grad.addColorStop(1,'rgba(100,70,10,0.04)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Glowing border
+    ctx.strokeStyle = `rgba(201,168,76,${0.18 + Math.sin(t*0.8)*0.08})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Inner bright core
+    const innerBlob = ctx.createRadialGradient(cx-20,cy-20,0,cx,cy,baseR*0.55);
+    innerBlob.addColorStop(0,'rgba(255,248,180,0.14)');
+    innerBlob.addColorStop(0.5,'rgba(245,220,100,0.07)');
+    innerBlob.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.beginPath(); ctx.arc(cx,cy,baseR*0.55,0,Math.PI*2);
+    ctx.fillStyle=innerBlob; ctx.fill();
+
+    // Second smaller blob offset — layered depth
+    const points2 = 8;
+    const baseR2 = 72;
+    ctx.beginPath();
+    for(let i=0;i<=points2*3;i++){
+      const angle=(i/points2)*Math.PI*2;
+      const r2 = baseR2
+        + Math.sin(angle*2 + t*1.3)*12
+        + Math.cos(angle*3 + t*0.6)*8
+        + Math.sin(t*0.6)*6;
+      const x = cx + r2*Math.cos(angle);
+      const y = cy + r2*Math.sin(angle);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    const grad2 = ctx.createRadialGradient(cx,cy,0,cx,cy,baseR2+10);
+    grad2.addColorStop(0,'rgba(255,240,140,0.14)');
+    grad2.addColorStop(0.5,'rgba(230,190,70,0.08)');
+    grad2.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.fillStyle=grad2; ctx.fill();
+    ctx.strokeStyle=`rgba(245,220,100,${0.12+Math.sin(t+1)*0.06})`;
+    ctx.lineWidth=0.8; ctx.stroke();
+
+    // Rotating light reflection dots
+    for(let i=0;i<6;i++){
+      const a = (i/6)*Math.PI*2 + t*0.3;
+      const r = baseR*0.75;
+      const dx = cx + r*Math.cos(a);
+      const dy = cy + r*Math.sin(a);
+      const pulse = (Math.sin(t*1.5+i)+1)/2;
+      const dotG = ctx.createRadialGradient(dx,dy,0,dx,dy,6+pulse*4);
+      dotG.addColorStop(0,`rgba(255,250,200,${0.25+pulse*0.25})`);
+      dotG.addColorStop(1,'rgba(255,250,200,0)');
+      ctx.beginPath(); ctx.arc(dx,dy,6+pulse*4,0,Math.PI*2);
+      ctx.fillStyle=dotG; ctx.fill();
+    }
+
+    // Sparkle cross at top-right of blob
+    const spAngle = t*0.4;
+    const spR = baseR + 10;
+    const spx = cx + spR*Math.cos(spAngle);
+    const spy = cy + spR*Math.sin(spAngle);
+    const spPulse = (Math.sin(t*2)+1)/2;
+    ctx.save(); ctx.globalAlpha = 0.5+spPulse*0.4;
+    ctx.strokeStyle='rgba(255,255,200,0.9)'; ctx.lineWidth=0.9;
+    const sz=5+spPulse*3;
+    ctx.beginPath();ctx.moveTo(spx-sz*2,spy);ctx.lineTo(spx+sz*2,spy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(spx,spy-sz*2);ctx.lineTo(spx,spy+sz*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(spx-sz,spy-sz);ctx.lineTo(spx+sz,spy+sz);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(spx+sz,spy-sz);ctx.lineTo(spx-sz,spy+sz);ctx.stroke();
+    ctx.restore();
+
+    t += 0.014;
+    requestAnimationFrame(drawBlob);
+  }
+
+  drawBlob();
+})();
+
 // ── PAGE NAV ──
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -571,8 +987,6 @@ function showPage(id){
   window.scrollTo(0,0);
   setTimeout(doReveal,120);
 }
-
-// ── REVEAL ──
 function doReveal(){
   document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
 }
@@ -959,5 +1373,222 @@ setInterval(function(){
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
   </svg>
 </a>
+
+<script>
+// ── 3D PARTICLE BACKGROUND ──
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, pts=[], sparkles=[];
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    init();
+  }
+
+  function init(){
+    pts = [];
+    for(let i=0;i<80;i++){
+      pts.push({
+        x:Math.random()*W, y:Math.random()*H,
+        z:Math.random()*2+0.3,
+        vx:(Math.random()-0.5)*0.3,
+        vy:(Math.random()-0.5)*0.2,
+        r:Math.random()*1.6+0.4,
+        op:Math.random()*0.45+0.08,
+        pulse:Math.random()*Math.PI*2,
+        pSpeed:0.01+Math.random()*0.016
+      });
+    }
+    sparkles = [];
+    for(let i=0;i<14;i++){
+      sparkles.push({
+        x:Math.random()*W, y:Math.random()*H,
+        size:Math.random()*2.5+1.2,
+        phase:Math.random()*Math.PI*2,
+        speed:0.015+Math.random()*0.025
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // Deep dark gold background
+    const bg = ctx.createRadialGradient(W*0.5,H*0.4,0,W*0.5,H*0.4,H);
+    bg.addColorStop(0,'rgba(22,16,4,1)');
+    bg.addColorStop(0.5,'rgba(14,11,3,1)');
+    bg.addColorStop(1,'rgba(8,6,1,1)');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    // Connections
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<140){
+          const alpha=0.065*(1-d/140)*((pts[i].z+pts[j].z)/4);
+          ctx.beginPath();
+          ctx.strokeStyle=`rgba(201,168,76,${alpha})`;
+          ctx.lineWidth=0.4*(pts[i].z+pts[j].z)/4;
+          ctx.moveTo(pts[i].x,pts[i].y);
+          ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Particles with 3D depth
+    pts.forEach(p=>{
+      p.x+=p.vx*p.z; p.y+=p.vy*p.z;
+      p.pulse+=p.pSpeed;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      const op=p.op*(0.55+0.45*Math.sin(p.pulse));
+      const size=p.r*p.z;
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,size*3.5);
+      g.addColorStop(0,`rgba(240,210,110,${op})`);
+      g.addColorStop(0.35,`rgba(201,168,76,${op*0.4})`);
+      g.addColorStop(1,'rgba(201,168,76,0)');
+      ctx.beginPath(); ctx.arc(p.x,p.y,size*3.5,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+    });
+
+    // Sparkle stars
+    sparkles.forEach(s=>{
+      s.phase+=s.speed;
+      const op=(Math.sin(s.phase)+1)/2;
+      if(op<0.12) return;
+      ctx.save(); ctx.globalAlpha=op*0.65;
+      ctx.strokeStyle='rgba(245,230,160,0.85)'; ctx.lineWidth=0.65;
+      const sz=s.size;
+      ctx.beginPath(); ctx.moveTo(s.x-sz*2.2,s.y); ctx.lineTo(s.x+sz*2.2,s.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(s.x,s.y-sz*2.2); ctx.lineTo(s.x,s.y+sz*2.2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(s.x-sz,s.y-sz); ctx.lineTo(s.x+sz,s.y+sz); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(s.x+sz,s.y-sz); ctx.lineTo(s.x-sz,s.y+sz); ctx.stroke();
+      ctx.restore();
+    });
+
+    // Top ambient glow
+    const topG=ctx.createRadialGradient(W*0.5,0,0,W*0.5,0,W*0.55);
+    topG.addColorStop(0,'rgba(201,168,76,0.04)');
+    topG.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.fillStyle=topG; ctx.fillRect(0,0,W,H);
+
+    requestAnimationFrame(draw);
+  }
+
+  resize(); draw();
+  window.addEventListener('resize', resize);
+})();
+</script>
+
+// ── GOLD COIN RAIN ──
+(function(){
+  const canvas = document.createElement('canvas');
+  canvas.id = 'rainCanvas';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const coins = [];
+  const COIN_COUNT = 35;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createCoin(){
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H - H,
+      size: 4 + Math.random() * 7,
+      speedY: 0.8 + Math.random() * 1.8,
+      speedX: (Math.random() - 0.5) * 0.4,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.06,
+      op: 0.3 + Math.random() * 0.5,
+      squish: 0.3 + Math.random() * 0.5,
+      shimmer: Math.random() * Math.PI * 2,
+      shimmerSpeed: 0.04 + Math.random() * 0.04
+    };
+  }
+
+  for(let i = 0; i < COIN_COUNT; i++){
+    const c = createCoin();
+    c.y = Math.random() * H; // start scattered
+    coins.push(c);
+  }
+
+  function drawCoin(c){
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+
+    // Coin squish for 3D spin effect
+    const squish = Math.abs(Math.sin(c.rot)) * 0.8 + 0.2;
+    ctx.scale(squish, 1);
+
+    // Coin glow
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, c.size * 2.5);
+    glow.addColorStop(0, `rgba(245,220,80,${c.op * 0.4})`);
+    glow.addColorStop(1, 'rgba(201,168,76,0)');
+    ctx.beginPath(); ctx.arc(0, 0, c.size * 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = glow; ctx.fill();
+
+    // Coin body gradient
+    const shimmerVal = (Math.sin(c.shimmer) + 1) / 2;
+    const g = ctx.createLinearGradient(-c.size, 0, c.size, 0);
+    g.addColorStop(0, `rgba(139,100,20,${c.op})`);
+    g.addColorStop(0.3, `rgba(201,168,76,${c.op})`);
+    g.addColorStop(0.5, `rgba(245,220,80,${c.op * (0.7 + shimmerVal * 0.5)})`);
+    g.addColorStop(0.7, `rgba(201,168,76,${c.op})`);
+    g.addColorStop(1, `rgba(139,100,20,${c.op})`);
+    ctx.beginPath(); ctx.ellipse(0, 0, c.size, c.size * 0.92, 0, 0, Math.PI * 2);
+    ctx.fillStyle = g; ctx.fill();
+
+    // Coin rim
+    ctx.strokeStyle = `rgba(245,220,100,${c.op * 0.6})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Inner ring detail
+    ctx.beginPath(); ctx.ellipse(0, 0, c.size * 0.6, c.size * 0.55, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(245,220,80,${c.op * 0.25})`; ctx.lineWidth = 0.5; ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function animate(){
+    ctx.clearRect(0, 0, W, H);
+    coins.forEach(c => {
+      c.y += c.speedY;
+      c.x += c.speedX;
+      c.rot += c.rotSpeed;
+      c.shimmer += c.shimmerSpeed;
+
+      // Add slight drift
+      c.speedX += (Math.random() - 0.5) * 0.02;
+      c.speedX = Math.max(-0.8, Math.min(0.8, c.speedX));
+
+      if(c.y > H + 20){
+        const fresh = createCoin();
+        fresh.y = -20;
+        Object.assign(c, fresh);
+      }
+      if(c.x < -20) c.x = W + 20;
+      if(c.x > W + 20) c.x = -20;
+
+      drawCoin(c);
+    });
+    requestAnimationFrame(animate);
+  }
+
+  resize(); animate();
+  window.addEventListener('resize', resize);
+})();
 </body>
 </html>

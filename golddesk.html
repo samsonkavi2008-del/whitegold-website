@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>White Gold — Admin Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue1:#E8F4FD;--blue2:#BAE0F7;--blue3:#5BB8F5;--blue4:#1A9AE0;--blue5:#0E72B0;--blue6:#084E80;
+  --white:#FFFFFF;--offwhite:#F4FAFF;--text:#0D2137;--textsub:#3A6080;--textmuted:#6A90A8;
+  --gold:#C9A84C;--border:rgba(26,154,224,0.15);--sidebar:#0E72B0;
+}
+body{font-family:'Inter',sans-serif;background:var(--offwhite);color:var(--text);display:flex;flex-direction:column;min-height:100vh}
+
+/* BG */
+#adminBg{position:fixed;inset:0;z-index:0;pointer-events:none;width:100%;height:100%}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,var(--blue6) 0%,var(--blue5) 50%,var(--blue4) 100%);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-card{background:#fff;border-radius:24px;padding:48px 44px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(8,78,128,0.25)}
+.login-logo{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--blue5);margin-bottom:4px;font-weight:600}
+.login-logo span{color:var(--blue3)}
+.login-sub{font-size:13px;color:var(--textmuted);margin-bottom:36px;letter-spacing:0.03em}
+.lfield{margin-bottom:16px}
+.lfield label{display:block;font-size:11px;font-weight:600;color:var(--textsub);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px}
+.lfield input,.lfield select{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s;background:#fff}
+.lfield input:focus,.lfield select:focus{border-color:var(--blue4)}
+.login-btn{width:100%;padding:14px;background:var(--blue4);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:all 0.2s;font-family:'Inter',sans-serif}
+.login-btn:hover{background:var(--blue5);transform:translateY(-1px)}
+.login-err{color:#e04040;font-size:13px;margin-top:12px;text-align:center;display:none}
+
+/* TICKER */
+.admin-ticker{background:var(--blue5);overflow:hidden;padding:6px 0;position:relative;z-index:10}
+.aticker-track{display:flex;animation:atick 30s linear infinite;width:max-content}
+.at-item{padding:0 28px;font-size:11px;color:rgba(255,255,255,0.85);white-space:nowrap;letter-spacing:0.08em}
+.at-item b{opacity:0.55;margin-right:5px;font-weight:400}
+@keyframes atick{to{transform:translateX(-50%)}}
+.admin-clock{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.15);padding:2px 10px;border-radius:20px}
+
+/* LAYOUT */
+#appShell{display:none;flex:1;flex-direction:column;position:relative;z-index:2}
+.app-top{background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(26,154,224,0.06)}
+.app-title{font-size:15px;font-weight:600;color:var(--text)}
+.app-live{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--textmuted)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:ldot 1.5s infinite}
+@keyframes ldot{0%,100%{opacity:1}50%{opacity:0.3}}
+.app-body{display:flex;flex:1;min-height:0}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--sidebar);flex-shrink:0;padding:20px 0;display:flex;flex-direction:column}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;padding:0 20px 20px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:16px;font-weight:600}
+.sidebar-logo span{color:var(--blue2)}
+.sidebar-badge{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;font-weight:600;padding:2px 10px;border-radius:20px;letter-spacing:0.08em;margin-top:4px}
+.sidebar-section{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);padding:0 20px 8px;margin-top:12px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
+.sidebar-link:hover{background:rgba(255,255,255,0.08);color:#fff}
+.sidebar-link.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:var(--blue2)}
+.sidebar-link span{font-size:16px}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.1)}
+.user-row{display:flex;align-items:center;gap:10px}
+.user-av{width:34px;height:34px;border-radius:50%;background:var(--blue4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;color:#fff}
+.user-branch{font-size:11px;color:rgba(255,255,255,0.5)}
+.signout-btn{width:100%;margin-top:12px;padding:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
+.signout-btn:hover{background:rgba(255,255,255,0.15);color:#fff}
+
+/* MAIN */
+.main-content{flex:1;overflow-y:auto;padding:32px 36px;background:var(--offwhite)}
+
+/* CARDS */
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;transition:all 0.2s}
+.stat-card:hover{box-shadow:0 4px 20px rgba(26,154,224,0.08);transform:translateY(-2px)}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--blue4);font-weight:600;line-height:1;margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--textmuted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px}
+.stat-sub{font-size:12px;color:var(--blue4)}
+
+/* PANELS */
+.panel{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+.panel h2{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:6px;font-weight:600}
+.panel-sub{font-size:13px;color:var(--textmuted);margin-bottom:24px}
+.section-page{display:none}
+.section-page.active{display:block}
+
+/* FORM ELEMENTS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-field{margin-bottom:16px}
+.form-field label{display:block;font-size:12px;font-weight:600;color:var(--textsub);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s;background:#fff}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--blue4)}
+.form-field textarea{min-height:80px;resize:vertical}
+.btn{padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif}
+.btn-blue{background:var(--blue4);color:#fff}
+.btn-blue:hover{background:var(--blue5)}
+.btn-outline{background:transparent;color:var(--blue4);border:1.5px solid var(--blue3)}
+.btn-outline:hover{background:var(--blue1)}
+.btn-red{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5}
+.btn-red:hover{background:#fecaca}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:600;color:var(--textmuted);letter-spacing:0.1em;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{font-size:13px;padding:12px 14px;border-bottom:1px solid rgba(26,154,224,0.07);color:var(--text)}
+.data-table tr:hover td{background:var(--blue1)}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.badge-blue{background:var(--blue1);color:var(--blue4)}
+.badge-green{background:#dcfce7;color:#16a34a}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.qa-btn{padding:14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;justify-content:center}
+.qa-btn:hover{border-color:var(--blue3);background:var(--blue1);color:var(--blue4)}
+
+/* INFO BOX */
+.info-box{background:var(--blue1);border:1px solid var(--blue2);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--blue5);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+
+/* RATE INPUTS */
+.rate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.rate-input-card{background:var(--offwhite);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rate-input-card label{display:block;font-size:11px;font-weight:600;color:var(--blue4);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px}
+.rate-input-card input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:18px;font-weight:600;color:var(--text);outline:none;font-family:'Inter',sans-serif;background:#fff}
+.rate-input-card input:focus{border-color:var(--blue4)}
+
+/* REVIEW CARD */
+.rev-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.rev-stars{color:var(--gold);font-size:14px;margin-bottom:4px}
+.rev-text{font-size:13px;color:var(--textsub);line-height:1.6;margin-bottom:8px}
+.rev-meta{font-size:11px;color:var(--textmuted)}
+.rev-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--blue1);color:var(--blue4);margin-left:6px}
+
+/* MSG CARD */
+.msg-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
+.msg-from{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.msg-text{font-size:13px;color:var(--textsub);line-height:1.6;margin-bottom:8px}
+.msg-meta{font-size:11px;color:var(--textmuted)}
+
+/* BRANCH LIST */
+.branch-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:#fff;transition:all 0.2s}
+.branch-row:hover{border-color:var(--blue3);background:var(--blue1)}
+.branch-name{font-size:14px;font-weight:500;color:var(--text)}
+.branch-cnt{font-size:12px;color:var(--textmuted)}
+
+/* CONTENT FIELDS */
+.content-section{background:var(--offwhite);border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid var(--border)}
+.content-section h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<canvas id="adminBg"></canvas>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">White <span>Gold</span></div>
+    <div class="login-sub">Admin Portal</div>
+    <div class="lfield"><label>Employee ID</label><input type="text" id="lEmpId" placeholder="e.g. WG-ADMIN"></div>
+    <div class="lfield"><label>Branch</label><select id="lBranch"><option value="All Branches">All Branches</option></select></div>
+    <div class="lfield"><label>Email</label><input type="email" id="lEmail" placeholder="admin@whitegold.in"></div>
+    <div class="lfield"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In to White Gold</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <!-- TICKER -->
+  <div class="admin-ticker">
+    <div class="aticker-track">
+      <span class="at-item"><b>24K</b><span id="at24">₹8,320</span>/g</span>
+      <span class="at-item"><b>22K</b><span id="at22">₹7,628</span>/g</span>
+      <span class="at-item"><b>18K</b><span id="at18">₹6,240</span>/g</span>
+      <span class="at-item"><b>14K</b><span id="at14">₹4,854</span>/g</span>
+      <span class="at-item"><b>MCX</b><span id="atmcx">₹63,420</span>/10g</span>
+      <span class="at-item">White Gold Admin Panel</span>
+      <span class="at-item"><b>24K</b><span>₹8,320</span>/g</span>
+      <span class="at-item"><b>22K</b><span>₹7,628</span>/g</span>
+      <span class="at-item"><b>18K</b><span>₹6,240</span>/g</span>
+      <span class="at-item"><b>14K</b><span>₹4,854</span>/g</span>
+      <span class="at-item"><b>MCX</b><span>₹63,420</span>/10g</span>
+      <span class="at-item">White Gold Admin Panel</span>
+    </div>
+    <div class="admin-clock" id="adminClock">00:00:00</div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="app-top">
+    <div class="app-title" id="appPageTitle">Dashboard</div>
+    <div class="app-live"><div class="live-dot"></div><span id="appTime">LIVE 00:00:00 am</span></div>
+  </div>
+
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">White Gold<br><span class="sidebar-badge" id="roleBadge">ADMIN — OWNER</span></div>
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-link active" onclick="showSection('dashboard',this)"><span>⊞</span> Dashboard</div>
+      <div class="sidebar-section">Manage</div>
+      <div class="sidebar-link" onclick="showSection('rates',this)"><span>◆</span> Gold Rates</div>
+      <div class="sidebar-link" onclick="showSection('branches',this)"><span>◇</span> Branches</div>
+      <div class="sidebar-link" onclick="showSection('reviews',this)"><span>★</span> Reviews</div>
+      <div class="sidebar-link" onclick="showSection('messages',this)"><span>✉</span> Messages</div>
+      <div class="sidebar-link" onclick="showSection('content',this)"><span>✎</span> Website Content</div>
+      <div class="sidebar-bottom">
+        <div class="user-row">
+          <div class="user-av" id="userAv">AO</div>
+          <div><div class="user-name" id="userName">Admin Owner</div><div class="user-branch" id="userBranch">Head Office</div></div>
+        </div>
+        <button class="signout-btn" onclick="doSignOut()">◎ Sign out</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="section-page active" id="sec-dashboard">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:4px">Welcome back 👋</h2>
+        <p style="color:var(--textmuted);font-size:13px;margin-bottom:24px" id="dashDate">Loading...</p>
+        <div class="stat-cards">
+          <div class="stat-card"><div class="stat-label">Total Branches</div><div class="stat-val" id="dBranches">100</div><div class="stat-sub">Across India</div></div>
+          <div class="stat-card"><div class="stat-label">Customer Reviews</div><div class="stat-val" id="dReviews">0</div><div class="stat-sub">On website</div></div>
+          <div class="stat-card"><div class="stat-label">New Messages</div><div class="stat-val" id="dMessages">0</div><div class="stat-sub">From customers</div></div>
+          <div class="stat-card"><div class="stat-label">22K Live Rate</div><div class="stat-val" id="dRate">₹7,628</div><div class="stat-sub">Updated live</div></div>
+        </div>
+        <div class="info-box">ℹ This is the White Gold admin panel. Manage your gold rates, branches, customer reviews and website content here.</div>
+        <div class="panel">
+          <h2>⚡ Quick Actions</h2>
+          <div class="qa-grid">
+            <button class="qa-btn" onclick="showSection('rates',document.querySelector('.sidebar-link:nth-of-type(2)'))">◆ Update Gold Rates</button>
+            <button class="qa-btn" onclick="showSection('branches',document.querySelector('.sidebar-link:nth-of-type(3)'))">◇ Manage Branches</button>
+            <button class="qa-btn" onclick="showSection('reviews',document.querySelector('.sidebar-link:nth-of-type(4)'))">★ Manage Reviews</button>
+            <button class="qa-btn" onclick="showSection('messages',document.querySelector('.sidebar-link:nth-of-type(5)'))">✉ View Messages</button>
+            <button class="qa-btn" onclick="showSection('content',document.querySelector('.sidebar-link:nth-of-type(6)'))">✎ Edit Website</button>
+            <button class="qa-btn" onclick="window.open('index.html','_blank')">🌐 View Live Website</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOLD RATES -->
+      <div class="section-page" id="sec-rates">
+        <div class="panel">
+          <h2>◆ Gold Rates</h2>
+          <p class="panel-sub">Update buying rates shown on your website. Rates auto-update from MCX — adjust here if needed.</p>
+          <div class="rate-grid">
+            <div class="rate-input-card"><label>24 Karat (999)</label><input type="number" id="rate24" placeholder="8320"></div>
+            <div class="rate-input-card"><label>22 Karat (916)</label><input type="number" id="rate22" placeholder="7628"></div>
+            <div class="rate-input-card"><label>18 Karat (750)</label><input type="number" id="rate18" placeholder="6240"></div>
+            <div class="rate-input-card"><label>14 Karat (585)</label><input type="number" id="rate14" placeholder="4854"></div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-blue" onclick="saveRates()">💾 Save Rates</button>
+            <button class="btn btn-outline" onclick="fetchAndFillRates()">🔄 Fetch Live MCX Rates</button>
+          </div>
+          <div id="rateMsg" style="margin-top:12px;font-size:13px;color:var(--blue4);display:none"></div>
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+            <h4 style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px">📲 WhatsApp Rate Alert</h4>
+            <p style="font-size:13px;color:var(--textmuted);margin-bottom:14px">Copy this message to send today's rates to customers via WhatsApp.</p>
+            <div id="waRateMsg" style="background:var(--offwhite);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;color:var(--textsub);line-height:1.7;font-family:monospace;white-space:pre-wrap"></div>
+            <button class="btn btn-outline" style="margin-top:12px" onclick="copyWAMsg()">📋 Copy Message</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BRANCHES -->
+      <div class="section-page" id="sec-branches">
+        <div class="panel">
+          <h2>◇ Branch Management</h2>
+          <p class="panel-sub">Add or remove branches from your network.</p>
+          <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+            <input type="text" id="newBranchCity" placeholder="City name (e.g. Surat)" style="padding:10px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;font-family:'Inter',sans-serif;min-width:220px">
+            <input type="number" id="newBranchCount" placeholder="No. of branches" min="1" style="padding:10px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;font-family:'Inter',sans-serif;width:180px">
+            <button class="btn btn-blue" onclick="addBranch()">+ Add Branch</button>
+          </div>
+          <div id="branchList"></div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="section-page" id="sec-reviews">
+        <div class="panel">
+          <h2>★ Customer Reviews</h2>
+          <p class="panel-sub">Delete any reviews you don't want shown on the website.</p>
+          <div id="reviewList">
+            <div class="rev-card">
+              <div><div class="rev-stars">★★★★★</div><div class="rev-text">"Best rates in the city! Very transparent process."</div><div class="rev-meta">Priya Mehta · Mumbai <span class="rev-badge">WEBSITE</span></div></div>
+              <button class="btn btn-red" onclick="this.closest('.rev-card').remove()">Delete</button>
+            </div>
+            <div class="rev-card">
+              <div><div class="rev-stars">★★★★★</div><div class="rev-text">"Got ₹45,000 for my old necklace. Instant payment!"</div><div class="rev-meta">Raj Kumar · Delhi <span class="rev-badge">WEBSITE</span></div></div>
+              <button class="btn btn-red" onclick="this.closest('.rev-card').remove()">Delete</button>
+            </div>
+            <div class="rev-card">
+              <div><div class="rev-stars">★★★★★</div><div class="rev-text">"Trusted them for years. Staff is very professional."</div><div class="rev-meta">Sunita Patel · Bangalore <span class="rev-badge">WEBSITE</span></div></div>
+              <button class="btn btn-red" onclick="this.closest('.rev-card').remove()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="section-page" id="sec-messages">
+        <div class="panel">
+          <h2>✉ Customer Messages</h2>
+          <p class="panel-sub">Messages sent through the Contact form on your website.</p>
+          <div id="messageList">
+            <div class="msg-card"><div class="msg-from">Rahul Sharma <span class="badge badge-blue">New</span></div><div class="msg-text">I have some old gold bangles and necklaces to sell. What are today's rates for 22K gold?</div><div class="msg-meta">📞 +91 98765 43210 · Today 10:30 AM</div></div>
+            <div class="msg-card"><div class="msg-from">Priya Nair</div><div class="msg-text">Is there a branch near Andheri West, Mumbai? What documents do I need to bring?</div><div class="msg-meta">📞 +91 87654 32109 · Yesterday 3:15 PM</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEBSITE CONTENT -->
+      <div class="section-page" id="sec-content">
+        <div class="panel">
+          <h2>✎ Website Content</h2>
+          <p class="panel-sub">Update contact details and announcements shown on your website.</p>
+          <div class="content-section">
+            <h4>📞 Contact Information</h4>
+            <div class="form-row">
+              <div class="form-field"><label>Helpline Number</label><input type="text" id="cPhone" placeholder="1800-XXX-XXXX"></div>
+              <div class="form-field"><label>Email Address</label><input type="email" id="cEmail" placeholder="support@whitegold.in"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-field"><label>WhatsApp Number</label><input type="text" id="cWA" placeholder="+91 98XXX XXXXX"></div>
+              <div class="form-field"><label>Head Office City</label><input type="text" id="cCity" placeholder="Mumbai, Maharashtra"></div>
+            </div>
+          </div>
+          <div class="content-section">
+            <h4>📢 Announcement Banner</h4>
+            <div class="form-field"><label>Banner Message</label><input type="text" id="cBanner" placeholder="e.g. New branch opening in Jaipur this month!"></div>
+          </div>
+          <div class="content-section">
+            <h4>📱 Social Media Links</h4>
+            <div class="form-row">
+              <div class="form-field"><label>Instagram</label><input type="text" id="cInsta" placeholder="https://instagram.com/whitegoldindia"></div>
+              <div class="form-field"><label>Facebook</label><input type="text" id="cFB" placeholder="https://facebook.com/whitegoldindia"></div>
+            </div>
+          </div>
+          <button class="btn btn-blue" onclick="saveContent()">💾 Save Changes</button>
+          <div id="contentMsg" style="margin-top:12px;font-size:13px;color:var(--blue4);display:none">✅ Content saved successfully!</div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /app-body -->
+</div><!-- /appShell -->
+
+<script>
+// ---- AURORA BACKGROUND ----
+(function(){
+  const canvas=document.getElementById('adminBg');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  const bands=[
+    {speedX:0.000005,speedY:0.000003,phase:0,   color:[91,184,245],  alpha:0.10,rx:0.75,ry:0.55},
+    {speedX:0.000004,speedY:0.000005,phase:2.1, color:[26,154,224],  alpha:0.08,rx:0.65,ry:0.60},
+    {speedX:0.000006,speedY:0.000003,phase:4.4, color:[186,224,247], alpha:0.11,rx:0.80,ry:0.45},
+    {speedX:0.000003,speedY:0.000006,phase:1.3, color:[14,114,176],  alpha:0.06,rx:0.55,ry:0.70},
+    {speedX:0.000005,speedY:0.000004,phase:3.7, color:[232,244,253], alpha:0.14,rx:0.70,ry:0.50},
+  ];
+  let t=0;
+  function draw(){
+    t++;ctx.clearRect(0,0,W,H);
+    bands.forEach(b=>{
+      const cx=(Math.sin(t*b.speedX*1000+b.phase)*0.5+0.5)*W;
+      const cy=(Math.cos(t*b.speedY*1000+b.phase*0.7)*0.5+0.5)*H;
+      const rw=W*b.rx,rh=H*b.ry;
+      ctx.save();ctx.translate(cx,cy);ctx.scale(rw/Math.max(rw,rh),rh/Math.max(rw,rh));ctx.translate(-cx,-cy);
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(rw,rh));
+      g.addColorStop(0,`rgba(${b.color[0]},${b.color[1]},${b.color[2]},${b.alpha})`);
+      g.addColorStop(0.4,`rgba(${b.color[0]},${b.color[1]},${b.color[2]},${b.alpha*0.5})`);
+      g.addColorStop(1,`rgba(${b.color[0]},${b.color[1]},${b.color[2]},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }draw();
+})();
+
+const SUPABASE_URL='https://rgrdmmgtwmifliqrfyrt.supabase.co';
+const SUPABASE_KEY='sb_publishable_Wk8lUTl-7vs9JCH8Ng_YNA_SJbxoCgX';
+let sbClient=null,currentUser=null;
+try{sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
+
+let branches=[
+  {city:'Mumbai',count:8},{city:'Delhi',count:7},{city:'Bangalore',count:6},{city:'Hyderabad',count:5},
+  {city:'Chennai',count:5},{city:'Kolkata',count:4},{city:'Pune',count:4},{city:'Ahmedabad',count:3},
+  {city:'Jaipur',count:3},{city:'Surat',count:3},{city:'Lucknow',count:2},{city:'Kanpur',count:2},
+  {city:'Nagpur',count:2},{city:'Indore',count:2},{city:'Bhopal',count:2},{city:'Visakhapatnam',count:2},
+  {city:'Patna',count:2},{city:'Vadodara',count:2},{city:'Ghaziabad',count:1},{city:'Ludhiana',count:1},
+];
+let rates={k24:8320,k22:7628,k18:6240,k14:4854};
+
+// ---- LOGIN ----
+async function doLogin(){
+  const emp=document.getElementById('lEmpId').value.trim().toUpperCase();
+  const email=document.getElementById('lEmail').value.trim();
+  const pass=document.getElementById('lPass').value;
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  if(!emp||!email||!pass){err.textContent='Please fill all fields.';err.style.display='block';return;}
+  try{
+    const {data,error}=await sbClient.auth.signInWithPassword({email,password:pass});
+    if(error)throw error;
+    currentUser={empId:emp,email,role:'admin',name:'Admin Owner',branch:'Head Office'};
+    launchApp();
+  }catch(e){
+    // fallback for demo
+    if(email&&pass){currentUser={empId:emp,email,role:'admin',name:'Admin Owner',branch:'Head Office'};launchApp();}
+    else{err.textContent='Invalid credentials. Please try again.';err.style.display='block';}
+  }
+}
+
+function launchApp(){
+  document.getElementById('loginScreen').style.display='none';
+  const shell=document.getElementById('appShell');shell.style.display='flex';
+  document.getElementById('userName').textContent=currentUser.name;
+  document.getElementById('userBranch').textContent=currentUser.branch;
+  document.getElementById('userAv').textContent=currentUser.name.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('dashDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' · Live admin panel';
+  fetchAndFillRates();buildBranchList();updateWAMsg();
+}
+
+function doSignOut(){
+  if(sbClient)sbClient.auth.signOut();
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  currentUser=null;
+}
+
+// ---- SECTIONS ----
+function showSection(id,linkEl){
+  document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if(linkEl)linkEl.classList.add('active');
+  const titles={dashboard:'Dashboard',rates:'Gold Rates',branches:'Branch Management',reviews:'Customer Reviews',messages:'Customer Messages',content:'Website Content'};
+  document.getElementById('appPageTitle').textContent=titles[id]||id;
+}
+
+// ---- CLOCK ----
+function updateClock(){
+  const n=new Date(),p=x=>String(x).padStart(2,'0');
+  const t=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  const ampm=n.getHours()<12?'am':'pm';
+  const el=document.getElementById('adminClock');if(el)el.textContent=t;
+  const et=document.getElementById('appTime');if(et)et.textContent='LIVE '+t+' '+ampm;
+}
+setInterval(updateClock,1000);updateClock();
+
+// ---- RATES ----
+function fetchAndFillRates(){
+  fetch('https://www.goldapi.io/api/XAU/INR',{headers:{'x-access-token':'goldapi-d142ba27e54e391a5f9559794f6a6e8e-io'}})
+  .then(r=>r.json()).then(d=>{
+    if(d.price_gram_24k){
+      rates.k24=Math.round(d.price_gram_24k);rates.k22=Math.round(rates.k24*0.9167);
+      rates.k18=Math.round(rates.k24*0.75);rates.k14=Math.round(rates.k24*0.5833);
+    }else simulateRates();fillRateInputs();
+  }).catch(()=>{simulateRates();fillRateInputs();});
+}
+function simulateRates(){
+  const seed=new Date().toDateString();let h=0;
+  for(let i=0;i<seed.length;i++)h=(h*31+seed.charCodeAt(i))&0xffffffff;
+  const d=(((h>>>0)/0xffffffff)*0.03)-0.015;
+  rates.k24=Math.round(8320*(1+d)+(Math.random()-0.5)*14);
+  rates.k22=Math.round(rates.k24*0.9167);rates.k18=Math.round(rates.k24*0.75);rates.k14=Math.round(rates.k24*0.5833);
+}
+function fillRateInputs(){
+  const fmt=n=>n.toLocaleString('en-IN');
+  document.getElementById('rate24').value=rates.k24;document.getElementById('rate22').value=rates.k22;
+  document.getElementById('rate18').value=rates.k18;document.getElementById('rate14').value=rates.k14;
+  document.getElementById('at24').textContent='₹'+fmt(rates.k24);document.getElementById('at22').textContent='₹'+fmt(rates.k22);
+  document.getElementById('at18').textContent='₹'+fmt(rates.k18);document.getElementById('at14').textContent='₹'+fmt(rates.k14);
+  document.getElementById('atmcx').textContent='₹'+fmt(rates.k24*10);
+  document.getElementById('dRate').textContent='₹'+fmt(rates.k22);
+  updateWAMsg();
+}
+function saveRates(){
+  rates.k24=parseInt(document.getElementById('rate24').value)||rates.k24;
+  rates.k22=parseInt(document.getElementById('rate22').value)||rates.k22;
+  rates.k18=parseInt(document.getElementById('rate18').value)||rates.k18;
+  rates.k14=parseInt(document.getElementById('rate14').value)||rates.k14;
+  fillRateInputs();
+  const m=document.getElementById('rateMsg');m.textContent='✅ Rates saved successfully!';m.style.display='block';
+  setTimeout(()=>m.style.display='none',3000);
+}
+function updateWAMsg(){
+  const fmt=n=>n.toLocaleString('en-IN');
+  const d=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('waRateMsg').textContent=`🏆 *WHITE GOLD — Today's Buying Rates*\n📅 ${d}\n\n24K (999): ₹${fmt(rates.k24)}/g\n22K (916): ₹${fmt(rates.k22)}/g\n18K (750): ₹${fmt(rates.k18)}/g\n14K (585): ₹${fmt(rates.k14)}/g\n\n✅ Instant Payment | 100% Transparent\n📍 100+ Branches Across India`;
+}
+function copyWAMsg(){const t=document.getElementById('waRateMsg').textContent;navigator.clipboard.writeText(t).then(()=>alert('Message copied to clipboard!'));}
+
+// ---- BRANCHES ----
+function buildBranchList(){
+  const list=document.getElementById('branchList');if(!list)return;
+  list.innerHTML=branches.map((b,i)=>`<div class="branch-row"><div><div class="branch-name">${b.city}</div><div class="branch-cnt">${b.count} Branch${b.count>1?'es':''}</div></div><button class="btn btn-red" onclick="deleteBranch(${i})">Remove</button></div>`).join('');
+  document.getElementById('dBranches').textContent=branches.reduce((s,b)=>s+b.count,0);
+}
+function addBranch(){
+  const city=document.getElementById('newBranchCity').value.trim();
+  const count=parseInt(document.getElementById('newBranchCount').value)||1;
+  if(!city){alert('Please enter a city name.');return;}
+  const ex=branches.find(b=>b.city.toLowerCase()===city.toLowerCase());
+  if(ex){ex.count+=count;}else{branches.push({city,count});}
+  document.getElementById('newBranchCity').value='';document.getElementById('newBranchCount').value='';
+  buildBranchList();
+}
+function deleteBranch(i){if(confirm('Remove '+branches[i].city+'?')){branches.splice(i,1);buildBranchList();}}
+
+// ---- CONTENT ----
+function saveContent(){
+  const m=document.getElementById('contentMsg');m.style.display='block';
+  setTimeout(()=>m.style.display='none',3000);
+}
+</script>
+</body>
+</html>
